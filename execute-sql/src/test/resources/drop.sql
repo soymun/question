@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS course1.groups;
+DROP SCHEMA IF EXISTS course1;
