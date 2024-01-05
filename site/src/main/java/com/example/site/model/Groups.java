@@ -22,4 +22,8 @@ public class Groups {
     private String fullName;
 
     private String shortName;
+
+    public Groups(Long id) {
+        this.id = id;
+    }
 }

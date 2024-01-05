@@ -10,3 +10,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/courses
   liquibase:
     enabled: true
+jwt:
+  token:
+    security: soymun
+    validate: 3600000
