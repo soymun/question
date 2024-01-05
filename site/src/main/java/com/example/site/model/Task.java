@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "task", schema = "courses")
 public class Task {
 
     @Id
@@ -31,4 +32,8 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Courses courses;
+
+    private Long allExecute;
+
+    private Long rightExecute;
 }

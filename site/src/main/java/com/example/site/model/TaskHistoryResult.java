@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "task_history_result", schema = "courses")
 public class TaskHistoryResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,7 @@ public class TaskHistoryResult {
 
     private String message;
 
-    private Boolean right;
+    private Boolean rights;
 
     private String code;
 }

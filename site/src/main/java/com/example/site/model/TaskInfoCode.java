@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "task_info_code", schema = "courses")
 public class TaskInfoCode {
 
     @Id

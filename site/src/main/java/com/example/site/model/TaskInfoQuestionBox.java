@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "task_info_question_box", schema = "courses")
 public class TaskInfoQuestionBox {
 
     @Id
@@ -23,5 +24,5 @@ public class TaskInfoQuestionBox {
 
     private String answer;
 
-    private Boolean right;
+    private Boolean rights;
 }

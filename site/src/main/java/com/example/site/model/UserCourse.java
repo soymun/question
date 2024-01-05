@@ -1,8 +1,7 @@
 package com.example.site.model;
 
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +14,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "user_course", schema = "courses")
 public class UserCourse {
 
     @EmbeddedId
@@ -25,4 +25,8 @@ public class UserCourse {
     private LocalDate endDate;
 
     private Boolean closed;
+
+    @ManyToOne
+    @JoinColumn(name = "mark_id")
+    private CourseMarks courseMarks;
 }

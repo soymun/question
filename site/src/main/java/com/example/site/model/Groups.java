@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "course-group", schema = "courses")
+@Table(name = "groups", schema = "courses")
 public class Groups {
 
     @Id

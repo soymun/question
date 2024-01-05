@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 @AllArgsConstructor
@@ -25,4 +26,17 @@ public class UserCourseId implements Serializable {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Courses courses;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserCourseId that = (UserCourseId) o;
+        return Objects.equals(user.getId(), that.user.getId()) && Objects.equals(courses.getId(), that.courses.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user.getId(), courses.getId());
+    }
 }

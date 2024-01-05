@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "course-user", schema = "courses")
+@Table(name = "users", schema = "courses")
 public class User {
 
     @Id

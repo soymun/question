@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 @AllArgsConstructor
@@ -25,4 +26,17 @@ public class UserTaskId implements Serializable {
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserTaskId that = (UserTaskId) o;
+        return Objects.equals(user.getId(), that.user.getId()) && Objects.equals(task.getId(), that.task.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user.getId(), task.getId());
+    }
 }

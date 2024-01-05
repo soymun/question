@@ -1,0 +1,12 @@
+server:
+  port: 8080
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  datasource:
+    username: postgres
+    password: qwerty
+    url: jdbc:postgresql://localhost:5432/courses
+  liquibase:
+    enabled: true
