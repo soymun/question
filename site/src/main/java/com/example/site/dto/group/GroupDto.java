@@ -1,4 +1,4 @@
-package com.example.site.dto;
+package com.example.site.dto.group;
 
 import lombok.Data;
 

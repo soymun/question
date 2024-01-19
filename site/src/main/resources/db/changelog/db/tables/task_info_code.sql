@@ -19,6 +19,8 @@ create table courses.task_info_code
 alter table courses.task_info_code
     owner to postgres;
 
+ALTER TABLE courses.task_info_code add constraint unique_1 unique (task_id, code_type);
+
 CREATE INDEX task_info_c_task_ind ON courses.task_info_code USING btree(task_id);
 
 

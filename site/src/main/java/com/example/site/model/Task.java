@@ -36,4 +36,11 @@ public class Task {
     private Long allExecute;
 
     private Long rightExecute;
+
+    private Boolean deleted;
+
+    private Boolean open;
+    public Task(Long id) {
+        this.id = id;
+    }
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,13 +21,19 @@ public class UserCourse {
     @EmbeddedId
     private UserCourseId userCourseId;
 
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 
     private Boolean closed;
+
+    private Boolean deleted;
 
     @ManyToOne
     @JoinColumn(name = "mark_id")
     private CourseMarks courseMarks;
+
+    public UserCourse(UserCourseId userCourseId) {
+        this.userCourseId = userCourseId;
+    }
 }

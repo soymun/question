@@ -5,7 +5,7 @@ create table courses.user_task
 (
     closed  boolean,
     rights  boolean,
-    attempt bigint,
+    attempt bigint default 1,
     task_id bigint not null
         constraint task_fk
             references courses.task,

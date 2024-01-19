@@ -31,4 +31,6 @@ public class Comments {
     private String message;
 
     private LocalDateTime time;
+
+    private Boolean apply;
 }

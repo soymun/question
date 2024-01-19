@@ -24,4 +24,8 @@ public class UserTask {
     private Boolean closed;
 
     private Long attempt;
+
+    public UserTask(UserTaskId userTaskId) {
+        this.userTaskId = userTaskId;
+    }
 }

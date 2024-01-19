@@ -39,4 +39,9 @@ public class UserTaskId implements Serializable {
     public int hashCode() {
         return Objects.hash(user.getId(), task.getId());
     }
+
+    public UserTaskId(Long user, Long task) {
+        this.user = new User(user);
+        this.task = new Task(task);
+    }
 }

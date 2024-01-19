@@ -4,8 +4,9 @@
 create table courses.user_course
 (
     closed     boolean,
-    end_date   date,
-    start_date date,
+    end_date   timestamp,
+    start_date timestamp,
+    deleted     boolean default false,
     course_id  bigint not null
         constraint course_fk
             references courses.courses,

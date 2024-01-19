@@ -36,4 +36,14 @@ public class Courses {
     private LocalDate timeCreated;
 
     private String schema;
+
+    private Boolean open;
+
+    private Boolean deleted;
+
+    private Long timeExecute;
+
+    public Courses(Long id) {
+        this.id = id;
+    }
 }

@@ -4,12 +4,11 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
-public class LoginResultDto {
+public class ResultDto<T> {
 
-    Map<String, Object> data;
+    private T data;
 
     private List<String> errors = new ArrayList<>();
 }

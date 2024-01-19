@@ -1,11 +1,16 @@
-package com.example.site.dto;
+package com.example.site.dto.user;
 
+import com.example.site.dto.group.GroupDto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class UserDto {
+
+    private List<String> error = new ArrayList<>();
 
     private Long id;
 

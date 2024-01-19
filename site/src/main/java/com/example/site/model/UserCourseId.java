@@ -39,4 +39,9 @@ public class UserCourseId implements Serializable {
     public int hashCode() {
         return Objects.hash(user.getId(), courses.getId());
     }
+
+    public UserCourseId(Long user, Long courses) {
+        this.user = new User(user);
+        this.courses = new Courses(courses);
+    }
 }

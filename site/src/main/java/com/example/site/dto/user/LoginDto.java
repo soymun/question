@@ -1,4 +1,4 @@
-package com.example.site.dto;
+package com.example.site.dto.user;
 
 import lombok.Data;
 

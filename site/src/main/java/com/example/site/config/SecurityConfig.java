@@ -33,7 +33,6 @@ public class SecurityConfig {
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/v1/registration").permitAll()
                         .requestMatchers("/v1/login").permitAll()
                         .anyRequest().authenticated())
                 .apply(new JwtTokenConfig(jwtTokenProvider));

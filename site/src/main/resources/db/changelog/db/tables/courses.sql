@@ -15,6 +15,8 @@ create table courses.courses
     about        varchar(255),
     course_name  varchar(255),
     path_image   varchar(255),
+    open boolean default false,
+    deleted boolean default false,
     schema       varchar(255)
 );
 
