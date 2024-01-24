@@ -39,7 +39,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.example</groupId>
+            <groupId>soymun</groupId>
             <artifactId>dtos</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

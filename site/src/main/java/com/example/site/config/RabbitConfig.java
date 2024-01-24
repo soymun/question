@@ -33,6 +33,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue completedCode(){
+        return new Queue("completed-code", true);
+    }
+
+    @Bean
     public Queue schemaQueue(){
         return new Queue("schema", true);
     }
@@ -50,6 +55,11 @@ public class RabbitConfig {
     @Bean
     public Binding resultBinding(){
         return BindingBuilder.bind(resultQueue()).to(directExchange()).with("result");
+    }
+
+    @Bean
+    public Binding completedCodeBinding(){
+        return BindingBuilder.bind(completedCode()).to(directExchange()).with("completed-code");
     }
 
     @Bean

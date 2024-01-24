@@ -2,7 +2,6 @@ package com.example.site.rest;
 
 import com.example.site.dto.ResultDto;
 import com.example.site.dto.user.LoginDto;
-import com.example.site.dto.user.LoginResultDto;
 import com.example.site.dto.user.UserCreateDto;
 import com.example.site.model.Role;
 import com.example.site.security.JwtTokenProvider;
@@ -13,13 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1")
 @RequiredArgsConstructor
 public class AuthController {
     private final UserServiceImpl userServiceImp;
@@ -27,8 +24,8 @@ public class AuthController {
 
     @PostMapping("/registration")
     @PreAuthorize(value = "hasAuthority('ADMIN')")
-    public ResponseEntity<ResultDto> registration(@RequestBody UserCreateDto userCreateDto) {
-        ResultDto resultDto = new ResultDto();
+    public ResponseEntity<ResultDto<?>> registration(@RequestBody UserCreateDto userCreateDto) {
+        ResultDto<?> resultDto = new ResultDto<>();
         try {
             if (userServiceImp.findUserByEmail(userCreateDto.getEmail()) != null) {
                 userServiceImp.saveUser(userCreateDto);

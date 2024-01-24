@@ -14,6 +14,8 @@ public interface TaskMapper {
 
     TaskInfoCode taskInfoCodeCreateToTaskInfoCode(TaskInfoCodeCreateDto taskInfoCodeCreateDto);
 
+    TaskInfoCodeDtoAdmin taskInfoCodeToTaskInfoCodeDtoAdmin(TaskInfoCode taskInfoCode);
+
     TaskInfoCodeDto taskInfoCodeToTaskInfoCodeDto(TaskInfoCode taskInfoCode);
 
     UserTaskDto userTaskToUserTaskDto(UserTask userTask);
@@ -25,6 +27,14 @@ public interface TaskMapper {
     TaskInfoQuestionBoxDto taskInfoBoxToDto(TaskInfoQuestionBox taskInfoQuestionBox);
 
     ResultExecute taskHistoryResultToResultExecute(TaskHistoryResult taskHistoryResult);
+
+    TaskInfoQuestionText taskInfoTextCreateDtoToTaskInfoText(TaskInfoQuestionTextCreateDto taskInfoQuestionTextCreateDto);
+
+    TaskInfoQuestionTextDto taskInfoTextToTaskInfoTextDto(TaskInfoQuestionText taskInfoQuestionText);
+
+    TaskInfoSql taskInfoCreateSqlToTaskInfoSql(TaskInfoSqlCreateDto taskInfoSqlCreateDto);
+
+    TaskInfoSqlAdminDto taskSqlToDtoAdmin(TaskInfoSql taskInfoSql);
 
 
     default Courses map(Long id){

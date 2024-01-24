@@ -33,10 +33,6 @@ public class Task {
     @JoinColumn(name = "course_id")
     private Courses courses;
 
-    private Long allExecute;
-
-    private Long rightExecute;
-
     private Boolean deleted;
 
     private Boolean open;

@@ -1,5 +1,6 @@
 package com.example.site.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,4 +12,11 @@ public class ResultDto<T> {
     private T data;
 
     private List<String> errors = new ArrayList<>();
+
+    public ResultDto(T data) {
+        this.data = data;
+    }
+
+    public ResultDto() {
+    }
 }

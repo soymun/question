@@ -4,7 +4,7 @@ import com.example.site.model.CodeType;
 import lombok.Data;
 
 @Data
-public class TaskInfoCodeDto {
+public class TaskInfoCodeDtoAdmin {
 
     private Long id;
 
@@ -13,4 +13,10 @@ public class TaskInfoCodeDto {
     private CodeType codeType;
 
     private String initCode;
+
+    private String checkCode;
+
+    private String checkClass;
+
+    private String userClass;
 }

@@ -14,13 +14,13 @@ public interface TaskService {
 
     List<TaskDto> getAllByCourseId(Long id);
 
-    List<TaskDto> getWithoutCreatedTaskByCourseId(Long id);
-
     List<UserTaskDto> getTaskToUserByCourse(Long userId, Long courseId);
 
-    TaskInfoCodeDto createTaskInfoCode(TaskInfoCodeCreateDto taskInfoCodeCreateDto);
+    TaskInfoCodeDtoAdmin createTaskInfoCode(TaskInfoCodeCreateDto taskInfoCodeCreateDto);
 
-    TaskInfoCodeDto updateTaskInfoCode(TaskInfoCodeUpdateDto taskInfoCodeUpdateDto);
+    TaskInfoCodeDtoAdmin updateTaskInfoCode(TaskInfoCodeUpdateDto taskInfoCodeUpdateDto);
+
+    List<TaskInfoCodeDtoAdmin> getInfoCodeByTaskIdAdmin(Long id);
 
     List<TaskInfoCodeDto> getInfoCodeByTaskId(Long id);
 
@@ -44,16 +44,19 @@ public interface TaskService {
 
     TaskInfoQuestionTextDto updateTaskInfoText(TaskInfoQuestionTextUpdateDto taskInfoQuestionTextCreateDto);
 
+    TaskInfoQuestionTextDto getTextByTaskId(Long taskId);
+
     ResultExecute executeText(ExecuteTextDto executeBoxDto);
 
     void deleteTaskInfoText(Long id);
 
-    TaskInfoSqlDto createTaskInfoSql(TaskInfoSqlCreateDto taskInfoSqlCreateDto);
+    TaskInfoSqlAdminDto createTaskInfoSql(TaskInfoSqlCreateDto taskInfoSqlCreateDto);
 
-    TaskInfoSqlDto updateTaskInfoSql(TaskInfoSqlUpdateDto taskInfoSqlCreateDto);
+    TaskInfoSqlAdminDto updateTaskInfoSql(TaskInfoSqlUpdateDto taskInfoSqlCreateDto);
 
     void deleteTaskInfoSql(Long id);
 
     void executeSql(ExecuteSqlDto executeSqlDto);
 
+    TaskInfoSqlAdminDto getSqlAdminByTaskId(Long id);
 }

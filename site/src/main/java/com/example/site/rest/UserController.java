@@ -24,83 +24,46 @@ public class UserController {
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    private ResponseEntity<ResultDto<UserDto>> updateUser(@RequestBody UserUpdateDto userUpdateDto){
-        ResultDto<UserDto> result = new ResultDto<>();
-        try {
-            result.setData(userService.updateUser(userUpdateDto));
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            result.getErrors().add(e.getMessage());
-            return ResponseEntity.ok(result);
-        }
+    private ResponseEntity<ResultDto<UserDto>> updateUser(@RequestBody UserUpdateDto userUpdateDto) {
+        return ResponseEntity.ok(new ResultDto<>(userService.updateUser(userUpdateDto)));
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<ResultDto<UserDto>> getUserById(@PathVariable Long id){
-        ResultDto<UserDto> result = new ResultDto<>();
-        try {
-            result.setData(userService.findById(id));
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            result.getErrors().add(e.getMessage());
-            return ResponseEntity.ok(result);
-        }
+    private ResponseEntity<ResultDto<UserDto>> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(new ResultDto<>(userService.findById(id)));
+
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    private ResponseEntity<ResultDto> deleteById(@PathVariable Long id){
-        ResultDto result = new ResultDto();
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            result.getErrors().add(e.getMessage());
-            return ResponseEntity.ok(result);
-        }
+    private ResponseEntity<ResultDto<UserDto>> deleteById(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.status(201).build();
+
     }
 
     @PutMapping("/change-password")
-    private ResponseEntity<ResultDto> passwordUpdate(@RequestBody PasswordUpdateDto passwordUpdateDto, @AuthenticationPrincipal UserDetailImpl userDetail){
-        ResultDto userDto = new ResultDto();
-        try {
-            if(passwordUpdateDto.getId().equals(userDetail.getId()) || userDetail.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN"))) {
-                if (userService.updatePassword(passwordUpdateDto)) {
-                    return ResponseEntity.ok(userDto);
-                }
-                return ResponseEntity.status(400).build();
-            } else {
-                return ResponseEntity.status(403).build();
+    private ResponseEntity<ResultDto<UserDto>> passwordUpdate(@RequestBody PasswordUpdateDto passwordUpdateDto, @AuthenticationPrincipal UserDetailImpl userDetail) {
+        if (passwordUpdateDto.getId().equals(userDetail.getId()) || userDetail.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN"))) {
+            if (userService.updatePassword(passwordUpdateDto)) {
+                return ResponseEntity.ok().build();
             }
-        } catch (Exception e) {
-            userDto.getErrors().add(e.getMessage());
-            return ResponseEntity.ok(userDto);
+            return ResponseEntity.status(400).build();
+        } else {
+            return ResponseEntity.status(403).build();
         }
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('TEACHER')")
-    private ResponseEntity<ResultDto<List<UserDto>>> getAll(@RequestParam int pageNumber, @RequestParam int pageSize){
-        ResultDto<List<UserDto>> result = new ResultDto<>();
-        try {
-            result.setData(userService.getAll(pageNumber, pageSize));
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            result.getErrors().add(e.getMessage());
-            return ResponseEntity.ok(result);
-        }
+    private ResponseEntity<ResultDto<List<UserDto>>> getAll(@RequestParam int pageNumber, @RequestParam int pageSize) {
+        return ResponseEntity.ok(new ResultDto<>(userService.getAll(pageNumber, pageSize)));
+
     }
 
     @GetMapping("/groups/{id}")
     @PreAuthorize("hasAuthority('TEACHER')")
-    private ResponseEntity<ResultDto<List<UserDto>>> getAllByGroup(@PathVariable Long id, @RequestParam int pageNumber, @RequestParam int pageSize){
-        ResultDto<List<UserDto>> result = new ResultDto<>();
-        try {
-            result.setData(userService.getAllByGroupId(id, pageNumber,pageSize));
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            result.getErrors().add(e.getMessage());
-            return ResponseEntity.ok(result);
-        }
+    private ResponseEntity<ResultDto<List<UserDto>>> getAllByGroup(@PathVariable Long id, @RequestParam int pageNumber, @RequestParam int pageSize) {
+        return ResponseEntity.ok(new ResultDto<>(userService.getAllByGroupId(id, pageNumber, pageSize)));
     }
 }

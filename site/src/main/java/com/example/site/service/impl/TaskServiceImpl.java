@@ -7,12 +7,14 @@ import com.example.site.model.*;
 import com.example.site.repository.*;
 import com.example.site.service.TaskService;
 import dto.CodeExecuteRequest;
+import dto.RequestCheckSql;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
@@ -42,14 +44,18 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskMapper taskMapper;
 
+    private final TaskInfoQuestionTextRepository taskInfoQuestionTextRepository;
+
+    private final TaskInfoSqlRepository taskInfoSqlRepository;
+
+    private final CourseRepository courseRepository;
+
     @Override
     public TaskDto createTask(TaskCreateDto taskCreateDto) {
-        if(taskCreateDto != null){
+        if (taskCreateDto != null) {
             Task task = taskMapper.taskCreateDtoToTask(taskCreateDto);
             task.setDeleted(false);
             task.setOpen(false);
-            task.setAllExecute(0L);
-            task.setRightExecute(0L);
             return taskMapper.taskToTaskDto(taskRepository.save(task));
         } else {
             throw new IllegalArgumentException("Невозможно создать задачу");
@@ -65,7 +71,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDto updateDto(TaskUpdateDto taskUpdateDto) {
-        if(taskUpdateDto != null){
+        if (taskUpdateDto != null) {
             Task task = taskRepository.findById(taskUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Не найдена задача"));
 
             ofNullable(taskUpdateDto.getTitle()).ifPresent(task::setTitle);
@@ -86,28 +92,23 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskDto> getWithoutCreatedTaskByCourseId(Long id) {
-        return taskRepository.findAllByCourseIdWithoutCreated(id).stream().map(taskMapper::taskToTaskDto).toList();
-    }
-
-    @Override
     public List<UserTaskDto> getTaskToUserByCourse(Long userId, Long courseId) {
         return userTaskRepository.getUserTaskByUserIdAndCourseId(userId, courseId).stream().map(taskMapper::userTaskToUserTaskDto).toList();
     }
 
     @Override
-    public TaskInfoCodeDto createTaskInfoCode(TaskInfoCodeCreateDto taskInfoCodeCreateDto) {
-        if(taskInfoCodeCreateDto != null){
+    public TaskInfoCodeDtoAdmin createTaskInfoCode(TaskInfoCodeCreateDto taskInfoCodeCreateDto) {
+        if (taskInfoCodeCreateDto != null) {
             TaskInfoCode taskInfoCode = taskMapper.taskInfoCodeCreateToTaskInfoCode(taskInfoCodeCreateDto);
-            return taskMapper.taskInfoCodeToTaskInfoCodeDto(taskInfoCodeRepository.save(taskInfoCode));
-        }else {
+            return taskMapper.taskInfoCodeToTaskInfoCodeDtoAdmin(taskInfoCodeRepository.save(taskInfoCode));
+        } else {
             throw new IllegalArgumentException("Невозможно создать задачу");
         }
     }
 
     @Override
-    public TaskInfoCodeDto updateTaskInfoCode(TaskInfoCodeUpdateDto taskInfoCodeUpdateDto) {
-        if(taskInfoCodeUpdateDto != null){
+    public TaskInfoCodeDtoAdmin updateTaskInfoCode(TaskInfoCodeUpdateDto taskInfoCodeUpdateDto) {
+        if (taskInfoCodeUpdateDto != null) {
             TaskInfoCode taskInfoCode = taskInfoCodeRepository.findById(taskInfoCodeUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             ofNullable(taskInfoCodeUpdateDto.getUserClass()).ifPresent(taskInfoCode::setUserClass);
@@ -115,10 +116,15 @@ public class TaskServiceImpl implements TaskService {
             ofNullable(taskInfoCodeUpdateDto.getInitCode()).ifPresent(taskInfoCode::setInitCode);
             ofNullable(taskInfoCodeUpdateDto.getCheckClass()).ifPresent(taskInfoCode::setCheckClass);
 
-            return taskMapper.taskInfoCodeToTaskInfoCodeDto(taskInfoCodeRepository.save(taskInfoCode));
-        }else {
+            return taskMapper.taskInfoCodeToTaskInfoCodeDtoAdmin(taskInfoCodeRepository.save(taskInfoCode));
+        } else {
             throw new IllegalArgumentException("Невозможно создать задачу");
         }
+    }
+
+    @Override
+    public List<TaskInfoCodeDtoAdmin> getInfoCodeByTaskIdAdmin(Long id) {
+        return taskInfoCodeRepository.getTaskInfoCodesByTaskId(id).stream().map(taskMapper::taskInfoCodeToTaskInfoCodeDtoAdmin).toList();
     }
 
     @Override
@@ -133,11 +139,14 @@ public class TaskServiceImpl implements TaskService {
 
         UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeCodeDto.getUserId(), taskInfoCode.getTask().getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
+        userTask.setAttempt(userTask.getAttempt() + 1);
+
         TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
         taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
         taskHistoryResult.setCode(executeCodeDto.getUserCode());
         taskHistoryResult.setMessage("");
         taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
+        taskHistoryResult.setTimeResult(LocalDateTime.now());
 
         TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
 
@@ -154,7 +163,6 @@ public class TaskServiceImpl implements TaskService {
 
         rabbitTemplate.convertAndSend(taskInfoCode.getCodeType().name(), codeExecuteRequest);
 
-        userTask.setAttempt(userTask.getAttempt() + 1);
         userTaskRepository.save(userTask);
     }
 
@@ -165,9 +173,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskInfoQuestionBoxAdminDto createTaskInfoBox(TaskInfoQuestionBoxCreateDto taskInfoQuestionBoxCreateDto) {
-        if(taskInfoQuestionBoxCreateDto != null){
+        if (taskInfoQuestionBoxCreateDto != null) {
             return taskMapper.taskInfoBoxToAdminDto(taskInfoQuestionBoxRepository.save(taskMapper.taskInfoBoxCreateDtoToTaskInfoBox(taskInfoQuestionBoxCreateDto)));
-        }else {
+        } else {
             throw new IllegalArgumentException("Невозможно создать задачу");
         }
     }
@@ -175,7 +183,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskInfoQuestionBoxAdminDto updateTaskInfoBox(TaskInfoQuestionBoxUpdateDto taskInfoQuestionBoxUpdateDto) {
 
-        if(taskInfoQuestionBoxUpdateDto != null){
+        if (taskInfoQuestionBoxUpdateDto != null) {
 
             TaskInfoQuestionBox taskInfoQuestionBox = taskInfoQuestionBoxRepository.findById(taskInfoQuestionBoxUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
@@ -184,7 +192,7 @@ public class TaskServiceImpl implements TaskService {
 
             return taskMapper.taskInfoBoxToAdminDto(taskInfoQuestionBoxRepository.save(taskInfoQuestionBox));
 
-        }else {
+        } else {
             throw new IllegalArgumentException("Невозможно создать задачу");
         }
     }
@@ -204,7 +212,7 @@ public class TaskServiceImpl implements TaskService {
 
         UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeBoxDto.getUserId(), executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
-        userTask.setAttempt(userTask.getAttempt() +1);
+        userTask.setAttempt(userTask.getAttempt() + 1);
 
         List<Long> listRightAnswerIds = taskInfoQuestionBoxRepository.getRightAnswerByTaskId(executeBoxDto.getTaskId());
 
@@ -212,8 +220,9 @@ public class TaskServiceImpl implements TaskService {
         taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
         taskHistoryResult.setCode("None");
         taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
+        taskHistoryResult.setTimeResult(LocalDateTime.now());
 
-        if(listRightAnswerIds.size() != executeBoxDto.getResultIds().size() || !new HashSet<>(listRightAnswerIds).containsAll(executeBoxDto.getResultIds())){
+        if (listRightAnswerIds.size() != executeBoxDto.getResultIds().size() || !new HashSet<>(listRightAnswerIds).containsAll(executeBoxDto.getResultIds())) {
 
             taskHistoryResult.setRights(false);
             taskHistoryResult.setMessage("Ответ не верен");
@@ -222,25 +231,29 @@ public class TaskServiceImpl implements TaskService {
 
             return taskMapper.taskHistoryResultToResultExecute(savedResult);
         } else {
-            userTask.setRights(true);
-            taskHistoryResult.setRights(true);
-            taskHistoryResult.setMessage("Ответ верен");
-
-            TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
-
-            CourseMarks courseMarks = courseMarksRepository.getCourseMarksByCourseIdAndCountTask(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId());
-            if(courseMarks != null){
-                UserCourse userCourse = userCourseRepository.getUserCourseByUserIdAndCourse(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
-
-                userCourse.setCourseMarks(courseMarks);
-
-                userCourseRepository.save(userCourse);
-            }
-
-            userTaskRepository.save(userTask);
-
-            return taskMapper.taskHistoryResultToResultExecute(savedResult);
+            return getResultExecute(userTask, taskHistoryResult);
         }
+    }
+
+    private ResultExecute getResultExecute(UserTask userTask, TaskHistoryResult taskHistoryResult) {
+        userTask.setRights(true);
+        taskHistoryResult.setRights(true);
+        taskHistoryResult.setMessage("Ответ верен");
+
+        TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
+
+        CourseMarks courseMarks = courseMarksRepository.getCourseMarksByCourseIdAndCountTask(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId());
+        if (courseMarks != null) {
+            UserCourse userCourse = userCourseRepository.getUserCourseByUserIdAndCourse(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
+
+            userCourse.setCourseMarks(courseMarks);
+
+            userCourseRepository.save(userCourse);
+        }
+
+        userTaskRepository.save(userTask);
+
+        return taskMapper.taskHistoryResultToResultExecute(savedResult);
     }
 
     @Override
@@ -250,41 +263,137 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskInfoQuestionTextDto createTaskInfoText(TaskInfoQuestionTextCreateDto taskInfoQuestionTextCreateDto) {
-        return null;
+        try {
+            if (taskInfoQuestionTextCreateDto != null) {
+                TaskInfoQuestionText taskInfoQuestionText = taskMapper.taskInfoTextCreateDtoToTaskInfoText(taskInfoQuestionTextCreateDto);
+                return taskMapper.taskInfoTextToTaskInfoTextDto(taskInfoQuestionTextRepository.save(taskInfoQuestionText));
+            } else {
+                throw new IllegalArgumentException("Невозможно создать задачу");
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Override
     public TaskInfoQuestionTextDto updateTaskInfoText(TaskInfoQuestionTextUpdateDto taskInfoQuestionTextCreateDto) {
-        return null;
+        if (taskInfoQuestionTextCreateDto != null) {
+            TaskInfoQuestionText taskInfoQuestionText = taskInfoQuestionTextRepository.findById(taskInfoQuestionTextCreateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+
+            ofNullable(taskInfoQuestionTextCreateDto.getText()).ifPresent(taskInfoQuestionText::setAnswer);
+
+            return taskMapper.taskInfoTextToTaskInfoTextDto(taskInfoQuestionTextRepository.save(taskInfoQuestionText));
+
+        } else {
+            throw new IllegalArgumentException("Невозможно создать задачу");
+        }
+    }
+
+    @Override
+    public TaskInfoQuestionTextDto getTextByTaskId(Long taskId) {
+        return taskMapper.taskInfoTextToTaskInfoTextDto(taskInfoQuestionTextRepository.findByTaskId(taskId).orElseThrow(() -> new NotFoundException("Задача не найдена")));
     }
 
     @Override
     public ResultExecute executeText(ExecuteTextDto executeBoxDto) {
-        return null;
+        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeBoxDto.getUserId(), executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+
+        userTask.setAttempt(userTask.getAttempt() + 1);
+
+        TaskInfoQuestionText answer = taskInfoQuestionTextRepository.findByTaskId(executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+
+        TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
+        taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
+        taskHistoryResult.setCode("None");
+        taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
+        taskHistoryResult.setTimeResult(LocalDateTime.now());
+
+        if (!answer.getAnswer().toLowerCase().trim().equals(executeBoxDto.getText())) {
+
+            taskHistoryResult.setRights(false);
+            taskHistoryResult.setMessage("Ответ не верен");
+
+            TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
+
+            return taskMapper.taskHistoryResultToResultExecute(savedResult);
+        } else {
+            return getResultExecute(userTask, taskHistoryResult);
+        }
     }
 
     @Override
     public void deleteTaskInfoText(Long id) {
-
+        taskInfoQuestionTextRepository.deleteById(id);
     }
 
     @Override
-    public TaskInfoSqlDto createTaskInfoSql(TaskInfoSqlCreateDto taskInfoSqlCreateDto) {
-        return null;
+    public TaskInfoSqlAdminDto createTaskInfoSql(TaskInfoSqlCreateDto taskInfoSqlCreateDto) {
+
+        try {
+            if (taskInfoSqlCreateDto != null) {
+                TaskInfoSql taskInfoSql = taskMapper.taskInfoCreateSqlToTaskInfoSql(taskInfoSqlCreateDto);
+
+                return taskMapper.taskSqlToDtoAdmin(taskInfoSqlRepository.save(taskInfoSql));
+            } else {
+                throw new IllegalArgumentException("Невозможно создать задачу");
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Override
-    public TaskInfoSqlDto updateTaskInfoSql(TaskInfoSqlUpdateDto taskInfoSqlCreateDto) {
-        return null;
+    public TaskInfoSqlAdminDto updateTaskInfoSql(TaskInfoSqlUpdateDto taskInfoSqlCreateDto) {
+        if (taskInfoSqlCreateDto != null) {
+
+            TaskInfoSql taskInfoSql = taskInfoSqlRepository.findById(taskInfoSqlCreateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+
+            ofNullable(taskInfoSqlCreateDto.getCheckSql()).ifPresent(taskInfoSql::setCheckSql);
+            ofNullable(taskInfoSqlCreateDto.getMainSql()).ifPresent(taskInfoSql::setMainSql);
+
+            return taskMapper.taskSqlToDtoAdmin(taskInfoSqlRepository.save(taskInfoSql));
+        } else {
+            throw new IllegalArgumentException("Невозможно создать задачу");
+        }
     }
 
     @Override
     public void deleteTaskInfoSql(Long id) {
-
+        taskInfoSqlRepository.deleteById(id);
     }
 
     @Override
     public void executeSql(ExecuteSqlDto executeSqlDto) {
+        TaskInfoSql taskInfoSql = taskInfoSqlRepository.getByTaskId(executeSqlDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
+        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeSqlDto.getUserId(), executeSqlDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+
+        TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
+        taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
+        taskHistoryResult.setCode(executeSqlDto.getUserSql());
+        taskHistoryResult.setMessage("");
+        taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
+        taskHistoryResult.setTimeResult(LocalDateTime.now());
+
+        TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
+
+        RequestCheckSql request = RequestCheckSql
+                .builder()
+                .checkSql(taskInfoSql.getCheckSql())
+                .mainSql(taskInfoSql.getMainSql())
+                .userSql(executeSqlDto.getUserSql())
+                .taskUserId(savedResult.getId())
+                .schema(courseRepository.findById(executeSqlDto.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден")).getSchema())
+                .build();
+
+        rabbitTemplate.convertAndSend("check", request);
+
+        userTask.setAttempt(userTask.getAttempt() + 1);
+        userTaskRepository.save(userTask);
+    }
+
+    @Override
+    public TaskInfoSqlAdminDto getSqlAdminByTaskId(Long id) {
+        return taskMapper.taskSqlToDtoAdmin(taskInfoSqlRepository.getByTaskId(id).orElseThrow(() -> new NotFoundException("Задача не найдена")));
     }
 }

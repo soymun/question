@@ -11,6 +11,7 @@ create table courses.task_history_result
     user_id bigint
         constraint user_fk
             references courses.users,
+    time_result timestamptz,
     code    varchar(255),
     message varchar(255)
 );

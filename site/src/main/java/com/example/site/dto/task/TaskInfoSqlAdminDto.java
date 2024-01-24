@@ -3,9 +3,11 @@ package com.example.site.dto.task;
 import lombok.Data;
 
 @Data
-public class TaskInfoSqlUpdateDto {
+public class TaskInfoSqlAdminDto {
 
     private Long id;
+
+    private Long task;
 
     private String checkSql;
 
