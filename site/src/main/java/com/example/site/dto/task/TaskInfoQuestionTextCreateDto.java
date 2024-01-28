@@ -7,5 +7,6 @@ public class TaskInfoQuestionTextCreateDto {
 
     private Long task;
 
-    private String text;
+    private String answer;
+
 }

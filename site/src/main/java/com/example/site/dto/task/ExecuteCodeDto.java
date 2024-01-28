@@ -7,7 +7,5 @@ public class ExecuteCodeDto {
 
     private Long id;
 
-    private Long userId;
-
     private String userCode;
 }

@@ -8,6 +8,7 @@ import com.example.site.service.impl.CommentServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +21,8 @@ public class CommentController {
     private final CommentServiceImpl commentService;
 
     @PostMapping
-    public ResponseEntity<ResultDto<CommentDto>> saveComment(@RequestBody CommentCreateDto commentCreateDto){
+    public ResponseEntity<ResultDto<CommentDto>> saveComment(@RequestBody CommentCreateDto commentCreateDto, @AuthenticationPrincipal(expression = "id") Long id){
+        commentCreateDto.setUser(id);
         return ResponseEntity.ok(new ResultDto<>(commentService.saveComment(commentCreateDto)));
     }
 
@@ -31,7 +33,7 @@ public class CommentController {
         return ResponseEntity.status(201).build();
     }
 
-    @DeleteMapping("/apply/{id}")
+    @PutMapping("/apply/{id}")
     @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<ResultDto<MarkDto>> applyComment(@PathVariable Long id){
         commentService.applyComment(id);

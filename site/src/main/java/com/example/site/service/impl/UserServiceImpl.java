@@ -11,6 +11,7 @@ import com.example.site.security.UserDetailImpl;
 import com.example.site.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
     public UserDto findUserByEmail(String email) {
         return userMapper.userToUserDto(
                 userRepository.findUserByEmail(email)
-                        .orElseThrow(() -> new NotFoundException("Пользователь не найден")));
+                        .orElse(null));
     }
 
     @Override

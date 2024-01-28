@@ -27,5 +27,5 @@ databaseChangeLog:
       file: classpath:/db/changelog/db/tables/task_info_question_text.sql
   - include:
       file: classpath:/db/changelog/db/tables/task_info_sql.sql
-  - include:
-      file: classpath:/db/changelog/db/insert/insert_admin.sql
+  - includeAll:
+      path: classpath:/db/changelog/db/insert/

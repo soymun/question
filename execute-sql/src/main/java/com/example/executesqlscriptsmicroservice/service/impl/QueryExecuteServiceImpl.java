@@ -59,7 +59,7 @@ public class QueryExecuteServiceImpl implements QueryExecuteService {
 
         List<Map<String, Object>> mainResult = null;
         try {
-            mainResult = processSelectSql(entityManager, requestCheckSql.getMainSql()).getFirst();
+            mainResult = processSelectSql(entityManager, requestCheckSql.getCheckSql()).getFirst();
         } catch (Exception ignored) {
 
         }

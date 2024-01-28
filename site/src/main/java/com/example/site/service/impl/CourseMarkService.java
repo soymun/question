@@ -46,7 +46,7 @@ public class CourseMarkService implements CourseMarksService {
 
         CourseMarks lessMark = courseMarksRepository.getCourseMarksLessCountByCourseId(courseMarks.getCourses().getId(), courseMarks.getCountTask());
 
-        userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(courseMarks.getCourses().getId(), courseMarks.getCountTask()).stream().peek(userCourse -> userCourse.setCourseMarks(lessMark)).toList());
+        userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseIdAndMark(courseMarks.getCourses().getId(), courseMarks.getCountTask()).stream().peek(userCourse -> userCourse.setCourseMarks(lessMark)).toList());
 
         courseMarksRepository.delete(courseMarks);
     }

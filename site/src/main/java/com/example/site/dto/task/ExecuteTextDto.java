@@ -7,7 +7,5 @@ public class ExecuteTextDto {
 
     private Long taskId;
 
-    private Long userId;
-
-    private String text;
+    private String answer;
 }

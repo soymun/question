@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    @Query(value = "from Task t where t.courses.id = :cId and t.deleted IS FALSE ORDER BY t.number")
+    @Query(value = "from Task t where t.courses.id = :cId and t.deleted = FALSE ORDER BY t.number")
     List<Task> findAllByCourseId(@Param("cId") Long courseId);
 
 
-    @Query(value = "from Task t where t.courses.id = :cId and t.deleted IS FALSE and t.open IS TRUE ORDER BY t.number")
+    @Query(value = "from Task t where t.courses.id = :cId and t.deleted = FALSE and t.open = TRUE ORDER BY t.number")
     List<Task> findAllByCourseIdWithoutCreated(@Param("cId") Long courseId);
 }

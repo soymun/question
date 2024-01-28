@@ -10,9 +10,9 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comments, Long> {
 
 
-    @Query(value = "from Comments  c where c.task.id=:tId and c.apply is true ")
+    @Query(value = "from Comments  c where c.task.id=:tId and c.apply = true ")
     List<Comments> getAllByTaskIdAndApply(@Param("tId") Long taskId);
 
-    @Query(value = "from Comments  c where c.task.id=:tId and c.apply is false ")
+    @Query(value = "from Comments  c where c.task.id=:tId and c.apply = false ")
     List<Comments> getAllByTaskIdAndNotApply(@Param("tId") Long taskId);
 }

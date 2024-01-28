@@ -11,12 +11,12 @@ import java.util.Optional;
 
 public interface UserTaskRepository extends JpaRepository<UserTask, UserTaskId> {
 
-    @Query(value = "from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.courses.id=:cId and  ut.closed IS FALSE ORDER BY ut.userTaskId.task.number")
+    @Query(value = "from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.courses.id=:cId and  ut.closed = FALSE ORDER BY ut.userTaskId.task.number")
     List<UserTask> getUserTaskByUserIdAndCourseId(@Param("uId") Long userId, @Param("cId") Long courseId);
 
     @Query(value = "from UserTask ut where ut.userTaskId.user.groups.id=:gId and ut.userTaskId.task.courses.id=:cId")
     List<UserTask> getUserTaskByGroupIdAndCourseId(@Param("gId") Long groupId, @Param("cId") Long courseId);
 
-    @Query(value = "from UserTask ut where ut.closed IS FALSE and ut.userTaskId.task.id=:taskId and ut.userTaskId.user.id=:userId")
+    @Query(value = "from UserTask ut where ut.closed = FALSE and ut.userTaskId.task.id=:taskId and ut.userTaskId.user.id=:userId")
     Optional<UserTask> getUserTaskByTaskIdAndUserId(@Param("userId") Long userId, @Param("taskId") Long taskId);
 }

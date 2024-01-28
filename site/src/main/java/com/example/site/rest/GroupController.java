@@ -40,7 +40,7 @@ public class GroupController {
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<ResultDto<GroupDto>> deleteById(@PathVariable Long id){
         groupService.deleteGroup(id);
-        return ResponseEntity.status(201).build();
+        return ResponseEntity.status(203).build();
     }
 
     @PostMapping

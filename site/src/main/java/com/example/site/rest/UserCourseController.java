@@ -10,6 +10,7 @@ import com.example.site.service.impl.UserCourseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,20 +25,20 @@ public class UserCourseController {
 
 
     @GetMapping("/course/{id}")
-    public ResponseEntity<ResultDto<UserCourseDto>> getUserCourseByUserIdAndCourseId(@PathVariable Long id, @AuthenticationPrincipal UserDetailImpl principal) {
-        return ResponseEntity.ok(new ResultDto<>(userCourseService.getUserCourseByUserIdAndCourseId(id, principal.getId())));
+    public ResponseEntity<ResultDto<UserCourseDto>> getUserCourseByUserIdAndCourseId(@PathVariable Long id, @AuthenticationPrincipal(expression = "id") Long idUser) {
+        return ResponseEntity.ok(new ResultDto<>(userCourseService.getUserCourseByUserIdAndCourseId(id, idUser)));
     }
 
     @GetMapping("/course/{id}/group/{gId}")
     @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<ResultDto<List<UserCourseDto>>> getUserByCourseIdAndGroupId(@PathVariable Long id, @PathVariable Long gId, @AuthenticationPrincipal UserDetailImpl principal) {
-        return ResponseEntity.ok(new ResultDto<>(userCourseService.getUserByCourseIdAndGroupId(id, gId, principal.getId(), principal.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN")))));
+    public ResponseEntity<ResultDto<List<UserCourseDto>>> getUserByCourseIdAndGroupId(@PathVariable Long id, @PathVariable Long gId, @AuthenticationPrincipal(expression = "id") Long idUser, @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
+        return ResponseEntity.ok(new ResultDto<>(userCourseService.getUserByCourseIdAndGroupId(id, gId, idUser, grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN")))));
     }
 
     @PostMapping
     @PreAuthorize(value = "hasAuthority('TEACHER')")
-    public ResponseEntity<ResultDto<UserCourseDto>> saveCourse(@RequestBody UserCourseCreateDto courseCreateDto, @AuthenticationPrincipal UserDetailImpl principal) {
-        userCourseService.saveUserCourse(courseCreateDto.getUserId(), courseCreateDto.getCourseId(), principal.getId(), principal.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN")));
+    public ResponseEntity<ResultDto<UserCourseDto>> saveCourse(@RequestBody UserCourseCreateDto courseCreateDto, @AuthenticationPrincipal(expression = "id") Long idUser, @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
+        userCourseService.saveUserCourse(courseCreateDto.getUserId(), courseCreateDto.getCourseId(), idUser, grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN")));
         return ResponseEntity.status(201).build();
     }
 

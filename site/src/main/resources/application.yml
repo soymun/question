@@ -4,6 +4,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+    open-in-view: false
   datasource:
     username: postgres
     password: qwerty

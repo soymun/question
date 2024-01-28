@@ -17,4 +17,6 @@ public class TaskCreateDto {
     private TaskType taskType;
 
     private Long courses;
+
+    private Boolean open;
 }

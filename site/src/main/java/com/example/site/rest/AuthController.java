@@ -27,7 +27,7 @@ public class AuthController {
     public ResponseEntity<ResultDto<?>> registration(@RequestBody UserCreateDto userCreateDto) {
         ResultDto<?> resultDto = new ResultDto<>();
         try {
-            if (userServiceImp.findUserByEmail(userCreateDto.getEmail()) != null) {
+            if (userServiceImp.findUserByEmail(userCreateDto.getEmail()) == null) {
                 userServiceImp.saveUser(userCreateDto);
                 return ResponseEntity.status(201).build();
             } else {

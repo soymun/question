@@ -55,4 +55,10 @@ public interface TaskMapper {
     default Task map3(UserTaskId userTaskId){
         return userTaskId.getTask();
     }
+
+    default Long map4(Task task){
+        if(task == null) return null;
+        return task.getId();
+    }
+
 }

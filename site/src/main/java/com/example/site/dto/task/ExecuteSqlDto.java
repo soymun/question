@@ -5,11 +5,7 @@ import lombok.Data;
 @Data
 public class ExecuteSqlDto {
 
-    private Long id;
-
-    private Long courseId;
-
-    private Long userId;
+    private Long taskId;
 
     private String userSql;
 }

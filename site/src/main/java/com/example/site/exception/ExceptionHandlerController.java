@@ -1,11 +1,13 @@
 package com.example.site.exception;
 
 import com.example.site.dto.ResultDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
+@Slf4j
 public class ExceptionHandlerController {
 
     @ExceptionHandler(value = NotFoundException.class)
@@ -25,6 +27,7 @@ public class ExceptionHandlerController {
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ResultDto<?>> exeption(Exception e) {
         ResultDto<?> resultDto = new ResultDto<>();
+        log.error("", e);
         resultDto.getErrors().add(e.getMessage());
         return ResponseEntity.internalServerError().body(resultDto);
     }

@@ -22,4 +22,6 @@ public class CourseDto {
     private UserInclude userCreated;
 
     private LocalDate timeCreated;
+
+    private Long timeExecute;
 }

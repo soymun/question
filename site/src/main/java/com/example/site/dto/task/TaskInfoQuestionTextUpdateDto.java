@@ -8,5 +8,5 @@ public class TaskInfoQuestionTextUpdateDto {
 
     private Long id;
 
-    private String text;
+    private String answer;
 }

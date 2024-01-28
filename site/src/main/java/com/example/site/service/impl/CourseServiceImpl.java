@@ -7,6 +7,7 @@ import com.example.site.dto.course.ExecuteSqlDto;
 import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.CourseMapper;
+import com.example.site.model.CourseType;
 import com.example.site.model.Courses;
 import com.example.site.repository.CourseRepository;
 import com.example.site.service.CourseService;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -62,7 +64,11 @@ public class CourseServiceImpl implements CourseService {
     public CourseDto saveCourse(CourseCreateDto courseCreateDto) {
         if (courseCreateDto != null) {
             Courses courses = courseMapper.courseCreateDtoToCourse(courseCreateDto);
+            courses.setDeleted(false);
             courses.setTimeCreated(LocalDate.now());
+            if(CourseType.USUALLY.equals(courses.getCourseType())){
+                courses.setTimeExecute(null);
+            }
             Courses savedCourse = courseRepository.save(courses);
             savedCourse.setSchema(((ResponseCreateSchema) Objects.requireNonNull(rabbitTemplate.convertSendAndReceive("schema", RequestCreateSchema.builder().courseId(savedCourse.getId()).build()))).getSchema());
             return courseMapper.courseToCourseDto(courseRepository.save(savedCourse));
@@ -79,6 +85,8 @@ public class CourseServiceImpl implements CourseService {
                 ofNullable(courseUpdateDto.getAbout()).ifPresent(courses::setAbout);
                 ofNullable(courseUpdateDto.getCourseType()).ifPresent(courses::setCourseType);
                 ofNullable(courseUpdateDto.getPathImage()).ifPresent(courses::setPathImage);
+                ofNullable(courseUpdateDto.getOpen()).ifPresent(courses::setOpen);
+                ofNullable(courseUpdateDto.getTimeExecute()).ifPresent(courses::setTimeExecute);
                 return courseMapper.courseToCourseDto(courseRepository.save(courses));
             }
             throw new ForbiddenException("Изменение не доступно");
@@ -105,7 +113,7 @@ public class CourseServiceImpl implements CourseService {
     public List<ResponseExecuteSql> executeSqlInCourse(ExecuteSqlDto requestExecuteSql, Long userId, boolean admin) {
         Courses courses = courseRepository.findById(requestExecuteSql.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
         boolean adminSql = admin || courses.getUserCreated().getId().equals(userId);
-        return (List<ResponseExecuteSql>) rabbitTemplate.convertSendAndReceive(RequestExecuteSql
+        return (List<ResponseExecuteSql>) rabbitTemplate.convertSendAndReceive("execute",RequestExecuteSql
                 .builder()
                 .admin(adminSql)
                 .userId(userId)

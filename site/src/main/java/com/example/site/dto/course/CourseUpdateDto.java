@@ -15,4 +15,8 @@ public class CourseUpdateDto {
     private String pathImage;
 
     private CourseType courseType;
+
+    private Boolean open;
+
+    private Long timeExecute;
 }

@@ -20,7 +20,7 @@ public class JavaExecuteWorker {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(queues = "java", group = "executors")
+    @RabbitListener(queues = "JAVA", group = "executors")
     public void execute(CodeExecuteRequest request) {
         if (request != null) {
             CodeExecuteResponse codeExecuteResponse;

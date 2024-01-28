@@ -10,7 +10,7 @@ import java.util.List;
 public interface TaskInfoQuestionBoxRepository extends JpaRepository<TaskInfoQuestionBox, Long> {
 
 
-    @Query(value = "select tb.id from TaskInfoQuestionBox tb where tb.task.id=:taskId and tb.rights is TRUE ")
+    @Query(value = "select tb.id from TaskInfoQuestionBox tb where tb.task.id=:taskId and tb.rights = TRUE ")
     List<Long> getRightAnswerByTaskId(@Param("taskId") Long taskId);
 
     @Query(value = "from TaskInfoQuestionBox tb where tb.task.id=:taskId")

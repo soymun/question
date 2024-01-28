@@ -9,5 +9,6 @@ public class TaskInfoQuestionTextDto {
 
     private Long task;
 
-    private String text;
+    private String answer;
+
 }

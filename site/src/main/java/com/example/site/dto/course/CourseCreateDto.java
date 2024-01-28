@@ -15,4 +15,9 @@ public class CourseCreateDto {
     private CourseType courseType;
 
     private Long userCreated;
+
+    private Boolean open;
+
+    private Long timeExecute;
+
 }

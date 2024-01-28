@@ -68,6 +68,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupDto> getGroupByCourseId(Long id) {
-        return groupRepository.getAllGroupsByCourse(id).stream().map(groupMapper::groupToGroupDto).toList();
+        return groupRepository.getAllGroupsByCourseId(id).stream().map(groupMapper::groupToGroupDto).toList();
     }
 }

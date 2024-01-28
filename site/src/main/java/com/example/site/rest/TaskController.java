@@ -46,7 +46,7 @@ public class TaskController {
     }
 
     @GetMapping("/user/course/{id}")
-    public ResponseEntity<ResultDto<List<UserTaskDto>>> getAllByQuery(@RequestParam Long id, @AuthenticationPrincipal UserDetailImpl principal) {
+    public ResponseEntity<ResultDto<List<UserTaskDto>>> getAllByQuery(@PathVariable Long id, @AuthenticationPrincipal UserDetailImpl principal) {
         return ResponseEntity.ok(new ResultDto<>(taskService.getTaskToUserByCourse(principal.getId(), id)));
     }
 
@@ -69,14 +69,13 @@ public class TaskController {
     }
 
     @GetMapping ("/info/code/task/{id}")
-    @PreAuthorize(value = "hasAuthority('TEACHER')")
     public ResponseEntity<ResultDto<List<TaskInfoCodeDto>>> getTaskInfoCodeByTaskId(@PathVariable Long id) {
         return ResponseEntity.ok(new ResultDto<>(taskService.getInfoCodeByTaskId(id)));
     }
 
     @PostMapping("/info/code/execute")
-    public ResponseEntity<ResultDto<?>> executeCode(@RequestBody ExecuteCodeDto executeCodeDto) {
-        taskService.executeCode(executeCodeDto);
+    public ResponseEntity<ResultDto<?>> executeCode(@RequestBody ExecuteCodeDto executeCodeDto, @AuthenticationPrincipal(expression = "id") Long id) {
+        taskService.executeCode(executeCodeDto, id);
         return ResponseEntity.ok(new ResultDto<>());
     }
 
@@ -112,8 +111,8 @@ public class TaskController {
     }
 
     @PostMapping("/info/box/execute")
-    public ResponseEntity<ResultDto<ResultExecute>> executeBox(@RequestBody ExecuteBoxDto executeCodeDto) {
-        return ResponseEntity.ok(new ResultDto<>(taskService.executeBox(executeCodeDto)));
+    public ResponseEntity<ResultDto<ResultExecute>> executeBox(@RequestBody ExecuteBoxDto executeCodeDto, @AuthenticationPrincipal(expression = "id") Long id) {
+        return ResponseEntity.ok(new ResultDto<>(taskService.executeBox(executeCodeDto, id)));
     }
 
     @DeleteMapping ("/info/box/{id}")
@@ -143,8 +142,8 @@ public class TaskController {
     }
 
     @PostMapping("/info/text/execute")
-    public ResponseEntity<ResultDto<ResultExecute>> executeText(@RequestBody ExecuteTextDto executeCodeDto) {
-        return ResponseEntity.ok(new ResultDto<>(taskService.executeText(executeCodeDto)));
+    public ResponseEntity<ResultDto<ResultExecute>> executeText(@RequestBody ExecuteTextDto executeCodeDto, @AuthenticationPrincipal(expression = "id") Long id) {
+        return ResponseEntity.ok(new ResultDto<>(taskService.executeText(executeCodeDto, id)));
     }
 
     @DeleteMapping ("/info/text/{id}")
@@ -174,8 +173,8 @@ public class TaskController {
     }
 
     @PostMapping("/info/sql/execute")
-    public ResponseEntity<ResultDto<?>> executeSql(@RequestBody ExecuteSqlDto executeCodeDto) {
-        taskService.executeSql(executeCodeDto);
+    public ResponseEntity<ResultDto<?>> executeSql(@RequestBody ExecuteSqlDto executeCodeDto, @AuthenticationPrincipal(expression = "id") Long id) {
+        taskService.executeSql(executeCodeDto, id);
         return ResponseEntity.ok(new ResultDto<>());
     }
 

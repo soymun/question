@@ -5,8 +5,6 @@ import lombok.Data;
 @Data
 public class TaskInfoSqlCreateDto {
 
-    private Long id;
-
     private Long task;
 
     private String checkSql;

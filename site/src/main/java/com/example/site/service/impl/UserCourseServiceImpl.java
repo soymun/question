@@ -41,9 +41,9 @@ public class UserCourseServiceImpl implements UserCourseService {
 
         Courses findCourse = courseRepository.findByIdAndUserAndAdminAndUser(courseId, thisUser, admin).orElseThrow(() -> new NotFoundException("Курс не найден"));
 
-        userTaskRepository.saveAll(taskRepository.findAllByCourseId(findCourse.getId()).stream().map(task -> new UserTask(new UserTaskId(userId, task.getId()))).toList());
+        userTaskRepository.saveAll(taskRepository.findAllByCourseId(findCourse.getId()).stream().map(task -> new UserTask(new UserTaskId(userId, task.getId()), false, false, 1L)).toList());
 
-        userCourseRepository.save(new UserCourse(new UserCourseId(userId, findCourse.getId())));
+        userCourseRepository.save(new UserCourse(new UserCourseId(userId, findCourse.getId()), null, null, false,false, null));
     }
 
     @Override

@@ -9,7 +9,5 @@ public class ExecuteBoxDto {
 
     private Long taskId;
 
-    private Long userId;
-
     private List<Long> resultIds;
 }

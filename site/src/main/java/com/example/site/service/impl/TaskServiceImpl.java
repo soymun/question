@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
@@ -56,7 +57,11 @@ public class TaskServiceImpl implements TaskService {
             Task task = taskMapper.taskCreateDtoToTask(taskCreateDto);
             task.setDeleted(false);
             task.setOpen(false);
-            return taskMapper.taskToTaskDto(taskRepository.save(task));
+            Task savedTask = taskRepository.save(task);
+
+            userTaskRepository.saveAll(userCourseRepository.getUserCourseByCourseId(taskCreateDto.getCourses()).stream().map(uc -> new UserTask(new UserTaskId(uc.getUserCourseId().getUser().getId(), savedTask.getId()), false, false, 1L)).toList());
+
+            return taskMapper.taskToTaskDto(savedTask);
         } else {
             throw new IllegalArgumentException("Невозможно создать задачу");
         }
@@ -93,7 +98,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<UserTaskDto> getTaskToUserByCourse(Long userId, Long courseId) {
-        return userTaskRepository.getUserTaskByUserIdAndCourseId(userId, courseId).stream().map(taskMapper::userTaskToUserTaskDto).toList();
+        return userTaskRepository.getUserTaskByUserIdAndCourseId(userId, courseId).stream().map(taskMapper::userTaskToUserTaskDto).collect(Collectors.toList());
     }
 
     @Override
@@ -133,11 +138,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void executeCode(ExecuteCodeDto executeCodeDto) {
+    public void executeCode(ExecuteCodeDto executeCodeDto, Long id) {
 
         TaskInfoCode taskInfoCode = taskInfoCodeRepository.findById(executeCodeDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeCodeDto.getUserId(), taskInfoCode.getTask().getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+
+        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, taskInfoCode.getTask().getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
         userTask.setAttempt(userTask.getAttempt() + 1);
 
@@ -145,6 +151,7 @@ public class TaskServiceImpl implements TaskService {
         taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
         taskHistoryResult.setCode(executeCodeDto.getUserCode());
         taskHistoryResult.setMessage("");
+        taskHistoryResult.setRights(false);
         taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
         taskHistoryResult.setTimeResult(LocalDateTime.now());
 
@@ -158,7 +165,7 @@ public class TaskServiceImpl implements TaskService {
                 .checkClass(taskInfoCode.getCheckClass())
                 .userCode(executeCodeDto.getUserCode())
                 .userClass(taskInfoCode.getUserClass())
-                .userId(executeCodeDto.getUserId())
+                .userId(id)
                 .build();
 
         rabbitTemplate.convertAndSend(taskInfoCode.getCodeType().name(), codeExecuteRequest);
@@ -208,9 +215,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public ResultExecute executeBox(ExecuteBoxDto executeBoxDto) {
+    public ResultExecute executeBox(ExecuteBoxDto executeBoxDto, Long id) {
 
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeBoxDto.getUserId(), executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
         userTask.setAttempt(userTask.getAttempt() + 1);
 
@@ -280,7 +287,7 @@ public class TaskServiceImpl implements TaskService {
         if (taskInfoQuestionTextCreateDto != null) {
             TaskInfoQuestionText taskInfoQuestionText = taskInfoQuestionTextRepository.findById(taskInfoQuestionTextCreateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
-            ofNullable(taskInfoQuestionTextCreateDto.getText()).ifPresent(taskInfoQuestionText::setAnswer);
+            ofNullable(taskInfoQuestionTextCreateDto.getAnswer()).ifPresent(taskInfoQuestionText::setAnswer);
 
             return taskMapper.taskInfoTextToTaskInfoTextDto(taskInfoQuestionTextRepository.save(taskInfoQuestionText));
 
@@ -295,8 +302,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public ResultExecute executeText(ExecuteTextDto executeBoxDto) {
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeBoxDto.getUserId(), executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+    public ResultExecute executeText(ExecuteTextDto executeBoxDto, Long id) {
+        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
         userTask.setAttempt(userTask.getAttempt() + 1);
 
@@ -308,7 +315,7 @@ public class TaskServiceImpl implements TaskService {
         taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
         taskHistoryResult.setTimeResult(LocalDateTime.now());
 
-        if (!answer.getAnswer().toLowerCase().trim().equals(executeBoxDto.getText())) {
+        if (!answer.getAnswer().toLowerCase().trim().equals(executeBoxDto.getAnswer())) {
 
             taskHistoryResult.setRights(false);
             taskHistoryResult.setMessage("Ответ не верен");
@@ -363,10 +370,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void executeSql(ExecuteSqlDto executeSqlDto) {
-        TaskInfoSql taskInfoSql = taskInfoSqlRepository.getByTaskId(executeSqlDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+    public void executeSql(ExecuteSqlDto executeSqlDto, Long id) {
+        TaskInfoSql taskInfoSql = taskInfoSqlRepository.getByTaskId(executeSqlDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(executeSqlDto.getUserId(), executeSqlDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeSqlDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
         TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
         taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
@@ -383,7 +390,7 @@ public class TaskServiceImpl implements TaskService {
                 .mainSql(taskInfoSql.getMainSql())
                 .userSql(executeSqlDto.getUserSql())
                 .taskUserId(savedResult.getId())
-                .schema(courseRepository.findById(executeSqlDto.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден")).getSchema())
+                .schema(courseRepository.findById(userTask.getUserTaskId().getTask().getCourses().getId()).orElseThrow(() -> new NotFoundException("Курс не найден")).getSchema())
                 .build();
 
         rabbitTemplate.convertAndSend("check", request);

@@ -15,13 +15,16 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, UserCour
     List<UserCourse> getUserCourseByCountTask(@Param("count") Long countTask, @Param("cId") Long coursesId);
 
     @Query(value = "from UserCourse uc where uc.userCourseId.courses.id = :cId and uc.courseMarks.id = :markId")
-    List<UserCourse> getUserCourseByCourseId(@Param("cId") Long courseId, @Param("markId") Long markId);
+    List<UserCourse> getUserCourseByCourseIdAndMark(@Param("cId") Long courseId, @Param("markId") Long markId);
 
-    @Query(value = "from UserCourse  uc where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.id=:userId and (uc.userCourseId.courses.userCreated.id = :tId or :admin is true)")
+    @Query(value = "from UserCourse uc where uc.userCourseId.courses.id = :cId")
+    List<UserCourse> getUserCourseByCourseId(@Param("cId") Long courseId);
+
+    @Query(value = "from UserCourse  uc where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.id=:userId and (uc.userCourseId.courses.userCreated.id = :tId or :admin = true)")
     Optional<UserCourse> getUserCourseByUserIdAndCourseAndTeacherAndAdmin(@Param("userId")Long userId, @Param("cId") Long courseId, @Param("tId") Long teacherId, @Param("admin") boolean admin);
 
 
-    @Query(value = "from UserCourse  uc where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.groups.id=:groupId and (uc.userCourseId.courses.userCreated.id = :tId or :admin is true)")
+    @Query(value = "from UserCourse  uc where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.groups.id=:groupId and (uc.userCourseId.courses.userCreated.id = :tId or :admin = true)")
     List<UserCourse> getAllByCourseIdAndGroupId(@Param("groupId")Long groupId, @Param("cId") Long courseId, @Param("tId") Long teacherId, @Param("admin") boolean admin);
 
     @Query(value = "from UserCourse  uc where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.id=:userId")

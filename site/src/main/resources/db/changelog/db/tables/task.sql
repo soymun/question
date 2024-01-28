@@ -6,14 +6,12 @@ create table courses.task
     task_type     smallint
         constraint task_task_type_check
             check ((task_type >= 0) AND (task_type <= 5)),
-    all_execute   bigint,
     course_id     bigint
         constraint course_fk
             references courses.courses,
     id            bigserial
         primary key,
     number        bigint,
-    right_execute bigint,
     description   varchar(255),
     name          varchar(255),
     title         varchar(255)

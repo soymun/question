@@ -40,7 +40,7 @@ public class Worker {
             taskHistoryResult.setRights(true);
             taskHistoryResult.setMessage(responseCheckSql.getMessage());
 
-            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(taskHistoryResult.getTask().getId(), taskHistoryResult.getUser().getId()).orElseThrow();
+            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(taskHistoryResult.getUser().getId(), taskHistoryResult.getTask().getId()).orElseThrow();
 
             userTask.setRights(true);
 
@@ -48,6 +48,7 @@ public class Worker {
 
             updateResult(userTask);
         } else {
+            taskHistoryResult.setRights(false);
             taskHistoryResult.setMessage(responseCheckSql.getMessage());
         }
 
@@ -71,6 +72,7 @@ public class Worker {
 
             updateResult(userTask);
         } else {
+            taskHistoryResult.setRights(false);
             taskHistoryResult.setMessage(responseCheckCode.getMessage());
         }
 
