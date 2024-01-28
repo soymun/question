@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class CourseMarkService implements CourseMarksService {
+public class CourseMarkServiceImpl implements CourseMarksService {
 
     private final CourseMarksRepository courseMarksRepository;
     private final UserCourseRepository userCourseRepository;
@@ -44,7 +44,7 @@ public class CourseMarkService implements CourseMarksService {
     public void deleteMark(Long id) {
         CourseMarks courseMarks = courseMarksRepository.findById(id).orElseThrow(() -> new NotFoundException("Оценка не найдена"));
 
-        CourseMarks lessMark = courseMarksRepository.getCourseMarksLessCountByCourseId(courseMarks.getCourses().getId(), courseMarks.getCountTask());
+        CourseMarks lessMark = courseMarksRepository.getCourseMarksLessCountByCourseId(courseMarks.getCourses().getId());
 
         userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseIdAndMark(courseMarks.getCourses().getId(), courseMarks.getCountTask()).stream().peek(userCourse -> userCourse.setCourseMarks(lessMark)).toList());
 

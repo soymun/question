@@ -3,7 +3,7 @@ package com.example.site.rest;
 import com.example.site.dto.ResultDto;
 import com.example.site.dto.marks.MarkCreateDto;
 import com.example.site.dto.marks.MarkDto;
-import com.example.site.service.impl.CourseMarkService;
+import com.example.site.service.impl.CourseMarkServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/course/marks")
 public class CourseMarkController {
 
-    private final CourseMarkService courseMarkService;
+    private final CourseMarkServiceImpl courseMarkService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('TEACHER')")

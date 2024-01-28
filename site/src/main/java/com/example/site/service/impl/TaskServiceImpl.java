@@ -72,6 +72,8 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundException("Не найдена задача"));
         task.setDeleted(true);
         taskRepository.save(task);
+        userTaskRepository.deleteUserTaskByTaskId(id);
+        userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(task.getCourses().getId()).stream().peek(uc -> uc.setCourseMarks(courseMarksRepository.getCourseMarksLessCountByCourseId(task.getCourses().getId()))).toList());
     }
 
     @Override
