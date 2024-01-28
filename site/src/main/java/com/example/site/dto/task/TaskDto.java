@@ -20,10 +20,6 @@ public class TaskDto {
 
     private Long courses;
 
-    private Long allExecute;
-
-    private Long rightExecute;
-
     private Boolean deleted;
 
     private Boolean open;
