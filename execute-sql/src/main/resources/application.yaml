@@ -1,6 +1,8 @@
 server:
-  port: 8081
+  port: 8882
 spring:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
@@ -8,3 +10,4 @@ spring:
   rabbitmq:
     template:
       exchange: courses
+    host: rabbitmq

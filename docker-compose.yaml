@@ -1,0 +1,110 @@
+version: "1"
+services:
+
+  question:
+    image: site:1.0.0
+    build:
+      context: ./site/
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres_db
+      - eurika
+      - rabbitmq
+    expose:
+      - 8880
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=qwerty
+    ports:
+      - "8880:8880"
+    restart: unless-stopped
+
+  sql:
+    image: sql:1.0.0
+    build:
+      context: ./execute-sql/
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres_db
+      - rabbitmq
+      - question
+    expose:
+      - 8882
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=qwerty
+    ports:
+      - "8882:8882"
+    restart: unless-stopped
+
+  eurika:
+    image: eurika:1.0.0
+    build:
+      context: ./evrika/
+      dockerfile: Dockerfile
+    expose:
+      - 8070
+    ports:
+      - "8070:8070"
+    restart: unless-stopped
+
+  java-execute:
+    image: java-execute:1.0.0
+    build:
+      context: ./java-execute/
+      dockerfile: Dockerfile
+    depends_on:
+      - question
+    expose:
+      - 8883
+    ports:
+      - "8883:8883"
+    restart: unless-stopped
+
+  file:
+    image: file:1.0.0
+    build:
+      context: ./file/
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    expose:
+      - 8881
+    ports:
+      - "8881:8881"
+    restart: unless-stopped
+
+  mongo:
+    image: mongo
+    restart: always
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  postgres_db:
+    image: postgres:11.8
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwerty
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data

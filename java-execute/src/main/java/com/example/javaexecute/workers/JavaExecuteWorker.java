@@ -14,11 +14,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JavaExecuteWorker {
 
-    @Autowired
-    private JavaExecuteServiceImpl javaExecuteService;
+    private  final JavaExecuteServiceImpl javaExecuteService;
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @RabbitListener(queues = "JAVA", group = "executors")
     public void execute(CodeExecuteRequest request) {

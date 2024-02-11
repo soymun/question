@@ -53,7 +53,7 @@ class QueryExecuteServiceImplTest {
                 .builder()
                 .schema("course1")
                 .userSql("SELECT id FROM groups")
-                .mainSql("SELECT id FROM groups")
+                .checkSql("SELECT id FROM groups")
                 .taskUserId(1L)
                 .build());
 
@@ -68,7 +68,7 @@ class QueryExecuteServiceImplTest {
                 .builder()
                 .schema("course1")
                 .userSql("SELECT id FROM groups")
-                .mainSql("SELECT name FROM groups")
+                .checkSql("SELECT name FROM groups")
                 .taskUserId(1L)
                 .build());
 

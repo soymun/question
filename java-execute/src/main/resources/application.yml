@@ -1,6 +1,7 @@
 server:
-  port: 8082
+  port: 8883
 spring:
   rabbitmq:
     template:
       exchange: courses
+    host: rabbitmq

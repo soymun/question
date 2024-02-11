@@ -1,16 +1,27 @@
 server:
-  port: 8080
+  port: 8880
 spring:
+  eureka:
+    instance:
+      preferIpAddress: true
+    client:
+      registerWithEureka: true
+      fetchRegistry: true
+      serviceUrl:
+        defaultZone: http://eurika:8070/eureka/
   jpa:
     hibernate:
       ddl-auto: none
     open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     username: postgres
     password: qwerty
-    url: jdbc:postgresql://localhost:5432/courses
+    url: jdbc:postgresql://localhost:5432/postgres
   liquibase:
     enabled: true
+  rabbitmq:
+    host: rabbitmq
 jwt:
   token:
     security: soymun
