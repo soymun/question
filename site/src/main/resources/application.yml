@@ -1,6 +1,10 @@
 server:
   port: 8880
+  servlet:
+    context-path: /site
 spring:
+  application:
+    name: site
   eureka:
     instance:
       preferIpAddress: true
