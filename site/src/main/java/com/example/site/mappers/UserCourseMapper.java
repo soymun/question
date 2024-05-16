@@ -1,7 +1,7 @@
 package com.example.site.mappers;
 
 import com.example.site.dto.user.UserInclude;
-import com.example.site.dto.user_course.UserCourseDto;
+import com.example.site.dto.usercourse.UserCourseDto;
 import com.example.site.model.Courses;
 import com.example.site.model.User;
 import com.example.site.model.UserCourse;

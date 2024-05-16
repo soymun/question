@@ -1,6 +1,5 @@
 version: "1"
 services:
-
   question:
     image: site:1.0.0
     build:
@@ -8,14 +7,16 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres_db
-      - eurika
       - rabbitmq
+    networks:
+      - network
     expose:
       - 8880
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty
+      - MINIO_ENDPOINT=http://minio:9000
     ports:
       - "8880:8880"
     restart: unless-stopped
@@ -29,6 +30,8 @@ services:
       - postgres_db
       - rabbitmq
       - question
+    networks:
+      - network
     expose:
       - 8882
     environment:
@@ -39,17 +42,6 @@ services:
       - "8882:8882"
     restart: unless-stopped
 
-  eurika:
-    image: eurika:1.0.0
-    build:
-      context: ./evrika/
-      dockerfile: Dockerfile
-    expose:
-      - 8070
-    ports:
-      - "8070:8070"
-    restart: unless-stopped
-
   java-execute:
     image: java-execute:1.0.0
     build:
@@ -57,35 +49,34 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - question
+    networks:
+      - network
     expose:
       - 8883
     ports:
       - "8883:8883"
     restart: unless-stopped
 
-  file:
-    image: file:1.0.0
-    build:
-      context: ./file/
-      dockerfile: Dockerfile
-    depends_on:
-      - mongo
-    expose:
-      - 8881
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    volumes:
+      - "/minio:/data"
     ports:
-      - "8881:8881"
-    restart: unless-stopped
-
-  mongo:
-    image: mongo
+      - "9000:9000"
+      - "37207:37207"
+    networks:
+      - network
     restart: always
-    expose:
-      - 27017
-    ports:
-      - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MINIO_ROOT_USER: "usercoffeemachine"
+      MINIO_ROOT_PASSWORD: "usercoffeemachine"
+    command: server /data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   rabbitmq:
     image: rabbitmq:3.10.7-management
@@ -93,6 +84,8 @@ services:
     restart: always
     volumes:
       - ./rabbitmq:/var/lib/rabbitmq
+    networks:
+      - network
     ports:
       - 15672:15672
       - 5672:5672
@@ -102,9 +95,14 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=qwerty
+    networks:
+      - network
     expose:
       - 5432
     ports:
       - "5432:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
+
+networks:
+  network:

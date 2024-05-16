@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -25,6 +27,7 @@ public class UserCourseId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @Fetch(FetchMode.JOIN)
     private Courses courses;
 
     @Override

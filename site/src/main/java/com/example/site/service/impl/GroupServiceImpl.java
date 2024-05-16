@@ -43,12 +43,18 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void deleteGroup(Long id) {
+
+        log.info("Delete group {}", id);
+
         groupRepository.deleteById(id);
     }
 
     @Override
     public GroupDto updateGroup(GroupDto groupDto) {
         if(groupDto != null){
+
+            log.info("Update group {}", groupDto.getId());
+
             Groups findGroups = groupRepository.findById(groupDto.getId()).orElseThrow(() -> new NotFoundException("Группа не найдена"));
             ofNullable(groupDto.getFullName()).ifPresent(findGroups::setFullName);
             ofNullable(groupDto.getShortName()).ifPresent(findGroups::setShortName);
@@ -60,6 +66,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupDto saveGroup(GroupCreateDto groupCreateDto) {
         if(groupCreateDto != null){
+
+            log.info("Save group");
+
             Groups groups = groupMapper.groupCreateDtoToGroup(groupCreateDto);
             return groupMapper.groupToGroupDto(groupRepository.save(groups));
         }

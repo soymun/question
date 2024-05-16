@@ -27,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDto saveComment(CommentCreateDto commentCreateDto) {
-
+        log.info("Save comment user {}", commentCreateDto.getUser());
         Comments comments = commentMapper.commentCreateDtoToComment(commentCreateDto);
 
         comments.setApply(false);
@@ -38,11 +38,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteComment(Long id) {
+        log.info("Delete comment {}", id);
         commentRepository.deleteById(id);
     }
 
     @Override
     public void applyComment(Long id) {
+        log.info("Apply comment {}", id);
         Comments comments = commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Комментарий не найден"));
 
         comments.setApply(true);

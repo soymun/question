@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Getter
@@ -31,7 +33,14 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @Fetch(FetchMode.JOIN)
     private Courses courses;
+
+    @Column(name = "all_attempt")
+    private Long allAttempt;
+
+    @Column(name = "right_attempt")
+    private Long rightAttempt;
 
     private Boolean deleted;
 

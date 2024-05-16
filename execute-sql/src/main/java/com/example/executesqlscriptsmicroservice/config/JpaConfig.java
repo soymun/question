@@ -11,7 +11,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 @Configuration
 public class JpaConfig {
 
-
     @Autowired
     private EntityManagerFactory emf;
 
@@ -21,7 +20,7 @@ public class JpaConfig {
     }
 
     @Bean
-    MessageConverter messageConverter() {
+    public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 }

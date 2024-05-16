@@ -6,17 +6,17 @@ import com.example.site.mappers.TaskMapper;
 import com.example.site.model.*;
 import com.example.site.repository.*;
 import com.example.site.service.TaskService;
-import dto.CodeExecuteRequest;
-import dto.RequestCheckSql;
+import dto.RequestCreateSchema;
+import dto.ResponseCreateSchema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
@@ -28,8 +28,6 @@ import static java.util.Optional.ofNullable;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
-
-    private final TaskHistoryResultRepository taskHistoryResultRepository;
 
     private final TaskInfoQuestionBoxRepository taskInfoQuestionBoxRepository;
 
@@ -54,6 +52,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDto createTask(TaskCreateDto taskCreateDto) {
         if (taskCreateDto != null) {
+
+            log.info("Save task at course {}", taskCreateDto.getCourses());
+
             Task task = taskMapper.taskCreateDtoToTask(taskCreateDto);
             task.setDeleted(false);
             task.setOpen(false);
@@ -69,6 +70,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteTask(Long id) {
+
+        log.info("Delete task {}", id);
+
         Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundException("Не найдена задача"));
         task.setDeleted(true);
         taskRepository.save(task);
@@ -79,6 +83,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDto updateDto(TaskUpdateDto taskUpdateDto) {
         if (taskUpdateDto != null) {
+
+            log.info("Update task {}", taskUpdateDto.getId());
+
             Task task = taskRepository.findById(taskUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Не найдена задача"));
 
             ofNullable(taskUpdateDto.getTitle()).ifPresent(task::setTitle);
@@ -106,6 +113,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskInfoCodeDtoAdmin createTaskInfoCode(TaskInfoCodeCreateDto taskInfoCodeCreateDto) {
         if (taskInfoCodeCreateDto != null) {
+
+            log.info("Create code info");
+
             TaskInfoCode taskInfoCode = taskMapper.taskInfoCodeCreateToTaskInfoCode(taskInfoCodeCreateDto);
             return taskMapper.taskInfoCodeToTaskInfoCodeDtoAdmin(taskInfoCodeRepository.save(taskInfoCode));
         } else {
@@ -116,6 +126,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskInfoCodeDtoAdmin updateTaskInfoCode(TaskInfoCodeUpdateDto taskInfoCodeUpdateDto) {
         if (taskInfoCodeUpdateDto != null) {
+
+            log.info("Update code info {}", taskInfoCodeUpdateDto.getId());
+
             TaskInfoCode taskInfoCode = taskInfoCodeRepository.findById(taskInfoCodeUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             ofNullable(taskInfoCodeUpdateDto.getUserClass()).ifPresent(taskInfoCode::setUserClass);
@@ -140,49 +153,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void executeCode(ExecuteCodeDto executeCodeDto, Long id) {
-
-        TaskInfoCode taskInfoCode = taskInfoCodeRepository.findById(executeCodeDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
-
-
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, taskInfoCode.getTask().getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
-
-        userTask.setAttempt(userTask.getAttempt() + 1);
-
-        TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
-        taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
-        taskHistoryResult.setCode(executeCodeDto.getUserCode());
-        taskHistoryResult.setMessage("");
-        taskHistoryResult.setRights(false);
-        taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
-        taskHistoryResult.setTimeResult(LocalDateTime.now());
-
-        TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
-
-        CodeExecuteRequest codeExecuteRequest = CodeExecuteRequest
-                .builder()
-                .attempt(userTask.getAttempt())
-                .taskId(savedResult.getId())
-                .checkCode(taskInfoCode.getCheckCode())
-                .checkClass(taskInfoCode.getCheckClass())
-                .userCode(executeCodeDto.getUserCode())
-                .userClass(taskInfoCode.getUserClass())
-                .userId(id)
-                .build();
-
-        rabbitTemplate.convertAndSend(taskInfoCode.getCodeType().name(), codeExecuteRequest);
-
-        userTaskRepository.save(userTask);
-    }
-
-    @Override
     public void deleteTaskInfoCode(Long id) {
+
+        log.info("Delete info code {}", id);
+
         taskInfoCodeRepository.deleteById(id);
     }
 
     @Override
     public TaskInfoQuestionBoxAdminDto createTaskInfoBox(TaskInfoQuestionBoxCreateDto taskInfoQuestionBoxCreateDto) {
         if (taskInfoQuestionBoxCreateDto != null) {
+
+            log.info("Create task info box");
+
             return taskMapper.taskInfoBoxToAdminDto(taskInfoQuestionBoxRepository.save(taskMapper.taskInfoBoxCreateDtoToTaskInfoBox(taskInfoQuestionBoxCreateDto)));
         } else {
             throw new IllegalArgumentException("Невозможно создать задачу");
@@ -193,6 +176,8 @@ public class TaskServiceImpl implements TaskService {
     public TaskInfoQuestionBoxAdminDto updateTaskInfoBox(TaskInfoQuestionBoxUpdateDto taskInfoQuestionBoxUpdateDto) {
 
         if (taskInfoQuestionBoxUpdateDto != null) {
+
+            log.info("Update task info box");
 
             TaskInfoQuestionBox taskInfoQuestionBox = taskInfoQuestionBoxRepository.findById(taskInfoQuestionBoxUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
@@ -217,56 +202,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public ResultExecute executeBox(ExecuteBoxDto executeBoxDto, Long id) {
-
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
-
-        userTask.setAttempt(userTask.getAttempt() + 1);
-
-        List<Long> listRightAnswerIds = taskInfoQuestionBoxRepository.getRightAnswerByTaskId(executeBoxDto.getTaskId());
-
-        TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
-        taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
-        taskHistoryResult.setCode("None");
-        taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
-        taskHistoryResult.setTimeResult(LocalDateTime.now());
-
-        if (listRightAnswerIds.size() != executeBoxDto.getResultIds().size() || !new HashSet<>(listRightAnswerIds).containsAll(executeBoxDto.getResultIds())) {
-
-            taskHistoryResult.setRights(false);
-            taskHistoryResult.setMessage("Ответ не верен");
-
-            TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
-
-            return taskMapper.taskHistoryResultToResultExecute(savedResult);
-        } else {
-            return getResultExecute(userTask, taskHistoryResult);
-        }
-    }
-
-    private ResultExecute getResultExecute(UserTask userTask, TaskHistoryResult taskHistoryResult) {
-        userTask.setRights(true);
-        taskHistoryResult.setRights(true);
-        taskHistoryResult.setMessage("Ответ верен");
-
-        TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
-
-        CourseMarks courseMarks = courseMarksRepository.getCourseMarksByCourseIdAndCountTask(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId());
-        if (courseMarks != null) {
-            UserCourse userCourse = userCourseRepository.getUserCourseByUserIdAndCourse(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
-
-            userCourse.setCourseMarks(courseMarks);
-
-            userCourseRepository.save(userCourse);
-        }
-
-        userTaskRepository.save(userTask);
-
-        return taskMapper.taskHistoryResultToResultExecute(savedResult);
-    }
-
-    @Override
     public void deleteTaskInfoBox(Long id) {
+
+        log.info("Delete info box {}", id);
+
         taskInfoQuestionBoxRepository.deleteById(id);
     }
 
@@ -274,6 +213,9 @@ public class TaskServiceImpl implements TaskService {
     public TaskInfoQuestionTextDto createTaskInfoText(TaskInfoQuestionTextCreateDto taskInfoQuestionTextCreateDto) {
         try {
             if (taskInfoQuestionTextCreateDto != null) {
+
+                log.info("Create info text");
+
                 TaskInfoQuestionText taskInfoQuestionText = taskMapper.taskInfoTextCreateDtoToTaskInfoText(taskInfoQuestionTextCreateDto);
                 return taskMapper.taskInfoTextToTaskInfoTextDto(taskInfoQuestionTextRepository.save(taskInfoQuestionText));
             } else {
@@ -287,6 +229,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskInfoQuestionTextDto updateTaskInfoText(TaskInfoQuestionTextUpdateDto taskInfoQuestionTextCreateDto) {
         if (taskInfoQuestionTextCreateDto != null) {
+
+            log.info("Update info text {}", taskInfoQuestionTextCreateDto.getId());
+
             TaskInfoQuestionText taskInfoQuestionText = taskInfoQuestionTextRepository.findById(taskInfoQuestionTextCreateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             ofNullable(taskInfoQuestionTextCreateDto.getAnswer()).ifPresent(taskInfoQuestionText::setAnswer);
@@ -304,43 +249,30 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public ResultExecute executeText(ExecuteTextDto executeBoxDto, Long id) {
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
-
-        userTask.setAttempt(userTask.getAttempt() + 1);
-
-        TaskInfoQuestionText answer = taskInfoQuestionTextRepository.findByTaskId(executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
-
-        TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
-        taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
-        taskHistoryResult.setCode("None");
-        taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
-        taskHistoryResult.setTimeResult(LocalDateTime.now());
-
-        if (!answer.getAnswer().toLowerCase().trim().equals(executeBoxDto.getAnswer())) {
-
-            taskHistoryResult.setRights(false);
-            taskHistoryResult.setMessage("Ответ не верен");
-
-            TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
-
-            return taskMapper.taskHistoryResultToResultExecute(savedResult);
-        } else {
-            return getResultExecute(userTask, taskHistoryResult);
-        }
-    }
-
-    @Override
     public void deleteTaskInfoText(Long id) {
+
+        log.info("Delete info text {}", id);
+
         taskInfoQuestionTextRepository.deleteById(id);
     }
 
     @Override
     public TaskInfoSqlAdminDto createTaskInfoSql(TaskInfoSqlCreateDto taskInfoSqlCreateDto) {
-
         try {
             if (taskInfoSqlCreateDto != null) {
+
+                log.info("Create info sql");
+
                 TaskInfoSql taskInfoSql = taskMapper.taskInfoCreateSqlToTaskInfoSql(taskInfoSqlCreateDto);
+
+                Optional<Courses> optionalCourses = courseRepository.getCoursesByTaskId(taskInfoSqlCreateDto.getTask());
+                if (optionalCourses.isPresent()) {
+                    Courses courses = optionalCourses.get();
+                    if (courses.getSchema() == null || courses.getSchema().isEmpty()) {
+                        courses.setSchema(((ResponseCreateSchema) Objects.requireNonNull(rabbitTemplate.convertSendAndReceive("schema", RequestCreateSchema.builder().courseId(courses.getId()).build()))).getSchema());
+                        courseRepository.save(courses);
+                    }
+                }
 
                 return taskMapper.taskSqlToDtoAdmin(taskInfoSqlRepository.save(taskInfoSql));
             } else {
@@ -355,6 +287,8 @@ public class TaskServiceImpl implements TaskService {
     public TaskInfoSqlAdminDto updateTaskInfoSql(TaskInfoSqlUpdateDto taskInfoSqlCreateDto) {
         if (taskInfoSqlCreateDto != null) {
 
+            log.info("Update info sql {}", taskInfoSqlCreateDto.getId());
+
             TaskInfoSql taskInfoSql = taskInfoSqlRepository.findById(taskInfoSqlCreateDto.getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             ofNullable(taskInfoSqlCreateDto.getCheckSql()).ifPresent(taskInfoSql::setCheckSql);
@@ -368,37 +302,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteTaskInfoSql(Long id) {
+
+        log.info("Delete info sql {}", id);
+
         taskInfoSqlRepository.deleteById(id);
-    }
-
-    @Override
-    public void executeSql(ExecuteSqlDto executeSqlDto, Long id) {
-        TaskInfoSql taskInfoSql = taskInfoSqlRepository.getByTaskId(executeSqlDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
-
-        UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeSqlDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
-
-        TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
-        taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
-        taskHistoryResult.setCode(executeSqlDto.getUserSql());
-        taskHistoryResult.setMessage("");
-        taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
-        taskHistoryResult.setTimeResult(LocalDateTime.now());
-
-        TaskHistoryResult savedResult = taskHistoryResultRepository.save(taskHistoryResult);
-
-        RequestCheckSql request = RequestCheckSql
-                .builder()
-                .checkSql(taskInfoSql.getCheckSql())
-                .mainSql(taskInfoSql.getMainSql())
-                .userSql(executeSqlDto.getUserSql())
-                .taskUserId(savedResult.getId())
-                .schema(courseRepository.findById(userTask.getUserTaskId().getTask().getCourses().getId()).orElseThrow(() -> new NotFoundException("Курс не найден")).getSchema())
-                .build();
-
-        rabbitTemplate.convertAndSend("check", request);
-
-        userTask.setAttempt(userTask.getAttempt() + 1);
-        userTaskRepository.save(userTask);
     }
 
     @Override

@@ -12,6 +12,8 @@ create table courses.task
     id            bigserial
         primary key,
     number        bigint,
+    all_attempt        bigint default 0,
+    right_attempt        bigint default 0,
     description   varchar(255),
     name          varchar(255),
     title         varchar(255)

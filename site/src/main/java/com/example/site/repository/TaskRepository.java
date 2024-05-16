@@ -2,6 +2,7 @@ package com.example.site.repository;
 
 import com.example.site.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,7 +13,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query(value = "from Task t where t.courses.id = :cId and t.deleted = FALSE ORDER BY t.number")
     List<Task> findAllByCourseId(@Param("cId") Long courseId);
 
+    @Modifying
+    @Query(value = "update Task t set t.allAttempt = t.allAttempt + 1 where t.id = :id")
+    void updateAllAttempt(@Param("id") Long id);
 
-    @Query(value = "from Task t where t.courses.id = :cId and t.deleted = FALSE and t.open = TRUE ORDER BY t.number")
-    List<Task> findAllByCourseIdWithoutCreated(@Param("cId") Long courseId);
+    @Modifying
+    @Query(value = "update Task t set t.rightAttempt = t.rightAttempt + 1 where t.id = :id")
+    void updateRightAttempt(@Param("id") Long id);
 }

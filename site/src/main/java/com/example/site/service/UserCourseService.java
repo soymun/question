@@ -1,15 +1,12 @@
 package com.example.site.service;
 
-import com.example.site.dto.user_course.UserCourseDto;
-import com.example.site.dto.user_course.UserCourseUpdate;
+import com.example.site.dto.usercourse.UserCourseDto;
 
 import java.util.List;
 
 public interface UserCourseService {
 
     void saveUserCourse(Long userId, Long courseId, Long thisUser, boolean admin);
-
-    void updateUserCourse(UserCourseUpdate userCourseUpdate);
 
     void deleteCourse(Long userId, Long courseId, Long thisUser, boolean admin);
 
@@ -18,4 +15,6 @@ public interface UserCourseService {
     List<UserCourseDto> getUserByCourseIdAndGroupId(Long courseId, Long groupId, Long thisUser, boolean admin);
 
     UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId, Long userId);
+
+    void saveUserCourseGroup(Long groupId, Long courseId, Long thisUser, boolean admin);
 }

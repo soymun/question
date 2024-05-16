@@ -9,18 +9,19 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class JavaExecuteWorker {
 
-    private  final JavaExecuteServiceImpl javaExecuteService;
+    private final JavaExecuteServiceImpl javaExecuteService;
 
     private final RabbitTemplate rabbitTemplate;
 
     @RabbitListener(queues = "JAVA", group = "executors")
     public void execute(CodeExecuteRequest request) {
         if (request != null) {
+            log.info("Execute sql user {}", request.getUserId());
             CodeExecuteResponse codeExecuteResponse;
             if (!request.getCheckCode().contains("System.exit") && !request.getUserCode().contains("System.exit")) {
                 codeExecuteResponse = javaExecuteService.execute(request);
@@ -36,7 +37,6 @@ public class JavaExecuteWorker {
             }
 
             rabbitTemplate.convertAndSend("completed-code", codeExecuteResponse);
-
         }
     }
 }

@@ -30,6 +30,8 @@ public class CourseMarkServiceImpl implements CourseMarksService {
     public MarkDto saveMark(MarkCreateDto markCreateDto) {
         if(markCreateDto != null){
 
+            log.info("Create mark at courses {}", markCreateDto.getCourses());
+
             CourseMarks courseMarks = courseMarksRepository.save(courseMarkMapper.markCreateDtoToCourseMarks(markCreateDto));
 
             userCourseRepository.saveAll(userCourseRepository.getUserCourseByCountTask(courseMarks.getCountTask(), courseMarks.getCourses().getId()).stream().peek(u -> u.setCourseMarks(courseMarks)).toList());
@@ -42,6 +44,9 @@ public class CourseMarkServiceImpl implements CourseMarksService {
 
     @Override
     public void deleteMark(Long id) {
+
+        log.info("Delete mark {}", id);
+
         CourseMarks courseMarks = courseMarksRepository.findById(id).orElseThrow(() -> new NotFoundException("Оценка не найдена"));
 
         CourseMarks lessMark = courseMarksRepository.getCourseMarksLessCountByCourseId(courseMarks.getCourses().getId());
