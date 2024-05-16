@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/refresh").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users").hasAuthority("TEACHER")
                         .requestMatchers(HttpMethod.GET, "/users/groups/{id}").hasAuthority("TEACHER")

@@ -5,21 +5,19 @@ import com.example.site.model.CourseMarks;
 import com.example.site.model.TaskHistoryResult;
 import com.example.site.model.UserCourse;
 import com.example.site.model.UserTask;
-import com.example.site.repository.CourseMarksRepository;
-import com.example.site.repository.TaskHistoryResultRepository;
-import com.example.site.repository.UserCourseRepository;
-import com.example.site.repository.UserTaskRepository;
+import com.example.site.repository.*;
 import dto.CodeExecuteResponse;
 import dto.ResponseCheckSql;
 import dto.Status;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class Worker {
 
     private final TaskHistoryResultRepository taskHistoryResultRepository;
@@ -29,14 +27,19 @@ public class Worker {
     private final UserCourseRepository userCourseRepository;
 
     private final UserTaskRepository userTaskRepository;
+    private final TaskRepository taskRepository;
 
 
     @RabbitListener(queues = "result", group = "result")
+    @Transactional
     public void listener(ResponseCheckSql responseCheckSql) {
+
+        log.info("Result check sql");
 
         TaskHistoryResult taskHistoryResult = taskHistoryResultRepository.findById(responseCheckSql.getTaskUserId()).orElseThrow();
 
         if (responseCheckSql.getStatus().equals(Status.OK)) {
+            taskRepository.updateRightAttempt(taskHistoryResult.getTask().getId());
             taskHistoryResult.setRights(true);
             taskHistoryResult.setMessage(responseCheckSql.getMessage());
 
@@ -56,11 +59,15 @@ public class Worker {
     }
 
     @RabbitListener(queues = "completed-code", group = "completed-code")
+    @Transactional
     public void listenerCode(CodeExecuteResponse responseCheckCode) {
+
+        log.info("Result check code");
 
         TaskHistoryResult taskHistoryResult = taskHistoryResultRepository.findById(responseCheckCode.getTaskId()).orElseThrow();
 
         if (responseCheckCode.getStatus().equals(Status.OK)) {
+            taskRepository.updateRightAttempt(taskHistoryResult.getTask().getId());
             taskHistoryResult.setRights(true);
             taskHistoryResult.setMessage(responseCheckCode.getMessage());
 

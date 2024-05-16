@@ -1,7 +1,7 @@
 package com.example.executesqlscriptsmicroservice.service.impl;
 
-import dto.*;
 import com.example.executesqlscriptsmicroservice.service.QueryExecuteService;
+import dto.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;
@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.query.sql.internal.NativeQueryImpl;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +23,7 @@ import java.util.Map;
 @Slf4j
 public class QueryExecuteServiceImpl implements QueryExecuteService {
 
-    @Autowired
-    EntityManagerFactory entityManagerFactory;
+    private final EntityManagerFactory entityManagerFactory;
 
     @Override
     public ResponseCheckSql checkSelectSql(RequestCheckSql requestCheckSql) {

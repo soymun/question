@@ -44,7 +44,6 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "group_id")
-    @Fetch(value = FetchMode.JOIN)
     private Groups groups;
 
     public User(Long id) {

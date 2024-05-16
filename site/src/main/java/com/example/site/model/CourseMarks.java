@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Getter
@@ -21,6 +23,7 @@ public class CourseMarks {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @Fetch(FetchMode.JOIN)
     private Courses courses;
 
     private Long countTask;

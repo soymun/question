@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "from User u where u.groups.id = :id",
             countQuery = "SELECT COUNT(u) from User u where u.groups.id = :id")
     Page<User> findUserByGroupId(@Param("id") Long id, Pageable pageable);
+
+    @Query(value = "from User u where u.groups.id = :id")
+    List<User> findUserByGroupId(@Param("id") Long id);
 }

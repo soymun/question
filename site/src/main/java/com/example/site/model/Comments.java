@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +28,7 @@ public class Comments {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @Fetch(FetchMode.JOIN)
     private User user;
 
     private String message;

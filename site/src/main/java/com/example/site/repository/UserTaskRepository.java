@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface UserTaskRepository extends JpaRepository<UserTask, UserTaskId> {
 
-    @Query(value = "from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.courses.id=:cId and  ut.closed = FALSE ORDER BY ut.userTaskId.task.number")
+    @Query(value = "from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.courses.id=:cId and  ut.closed = FALSE and ut.userTaskId.task.open and ut.userTaskId.task.deleted = false ORDER BY ut.userTaskId.task.number")
     List<UserTask> getUserTaskByUserIdAndCourseId(@Param("uId") Long userId, @Param("cId") Long courseId);
 
     @Query(value = "from UserTask ut where ut.userTaskId.user.groups.id=:gId and ut.userTaskId.task.courses.id=:cId")

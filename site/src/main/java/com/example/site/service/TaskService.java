@@ -24,8 +24,6 @@ public interface TaskService {
 
     List<TaskInfoCodeDto> getInfoCodeByTaskId(Long id);
 
-    void executeCode(ExecuteCodeDto executeCodeDto, Long id);
-
     void deleteTaskInfoCode(Long id);
 
     TaskInfoQuestionBoxAdminDto createTaskInfoBox(TaskInfoQuestionBoxCreateDto taskInfoQuestionBoxCreateDto);
@@ -36,8 +34,6 @@ public interface TaskService {
 
     List<TaskInfoQuestionBoxDto> getByTaskId(Long courseId);
 
-    ResultExecute executeBox(ExecuteBoxDto executeBoxDto, Long id);
-
     void deleteTaskInfoBox(Long id);
 
     TaskInfoQuestionTextDto createTaskInfoText(TaskInfoQuestionTextCreateDto taskInfoQuestionTextCreateDto);
@@ -46,8 +42,6 @@ public interface TaskService {
 
     TaskInfoQuestionTextDto getTextByTaskId(Long taskId);
 
-    ResultExecute executeText(ExecuteTextDto executeBoxDto, Long id);
-
     void deleteTaskInfoText(Long id);
 
     TaskInfoSqlAdminDto createTaskInfoSql(TaskInfoSqlCreateDto taskInfoSqlCreateDto);
@@ -55,8 +49,6 @@ public interface TaskService {
     TaskInfoSqlAdminDto updateTaskInfoSql(TaskInfoSqlUpdateDto taskInfoSqlCreateDto);
 
     void deleteTaskInfoSql(Long id);
-
-    void executeSql(ExecuteSqlDto executeSqlDto, Long id);
 
     TaskInfoSqlAdminDto getSqlAdminByTaskId(Long id);
 }

@@ -7,6 +7,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: qwerty
+    hikari:
+      maximum-pool-size: 25
+      minimum-idle: 10000
   rabbitmq:
     template:
       exchange: courses

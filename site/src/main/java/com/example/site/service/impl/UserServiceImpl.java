@@ -11,7 +11,6 @@ import com.example.site.security.UserDetailImpl;
 import com.example.site.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
@@ -44,6 +44,9 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
             userRepository.save(findUser);
+
+            log.info("Authorization user {}", findUser.getId());
+
             return new UserDetailImpl(findUser.getId(), findUser.getEmail(), findUser.getPassword(), findUser.getRole().getAuthority(), findUser.getActive());
         } else {
             throw new NotFoundException("Пользователь не найден");
@@ -58,8 +61,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Pair<Long, Role> getUserRole(String email) {
+        Optional<User> findUser = userRepository.findUserByEmail(email);
+        if(findUser.isPresent()){
+            return Pair.of(findUser.get().getId(), findUser.get().getRole());
+        }
+        throw new NotFoundException("Пользователь не найден");
+    }
+
+    @Override
     public UserDto saveUser(UserCreateDto userCreateDto) {
         if (userCreateDto != null) {
+
+            log.info("Save user");
+
             User mappedUser = userMapper.userCreateDtoToUser(userCreateDto);
             mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
             mappedUser.setRole(Role.USER);
@@ -71,6 +86,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UserUpdateDto userUpdateDto) {
         if (userUpdateDto != null) {
+
+            log.info("Update user");
+
             User user = userRepository.findById(userUpdateDto.getId())
                     .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
@@ -87,6 +105,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
+
+        log.info("Delete user");
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         user.setActive(false);

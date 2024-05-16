@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -31,6 +34,7 @@ public class Courses {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @Fetch(FetchMode.JOIN)
     private User userCreated;
 
     private LocalDate timeCreated;
@@ -41,7 +45,7 @@ public class Courses {
 
     private Boolean deleted;
 
-    private Long timeExecute;
+    private LocalDateTime timeExecute;
 
     public Courses(Long id) {
         this.id = id;

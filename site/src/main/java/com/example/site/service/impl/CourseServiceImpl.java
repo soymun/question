@@ -11,9 +11,7 @@ import com.example.site.model.CourseType;
 import com.example.site.model.Courses;
 import com.example.site.repository.CourseRepository;
 import com.example.site.service.CourseService;
-import dto.RequestCreateSchema;
 import dto.RequestExecuteSql;
-import dto.ResponseCreateSchema;
 import dto.ResponseExecuteSql;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -63,15 +59,16 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseDto saveCourse(CourseCreateDto courseCreateDto) {
         if (courseCreateDto != null) {
+
+            log.info("Save course");
+
             Courses courses = courseMapper.courseCreateDtoToCourse(courseCreateDto);
             courses.setDeleted(false);
             courses.setTimeCreated(LocalDate.now());
-            if(CourseType.USUALLY.equals(courses.getCourseType())){
+            if (CourseType.USUALLY.equals(courses.getCourseType())) {
                 courses.setTimeExecute(null);
             }
-            Courses savedCourse = courseRepository.save(courses);
-            savedCourse.setSchema(((ResponseCreateSchema) Objects.requireNonNull(rabbitTemplate.convertSendAndReceive("schema", RequestCreateSchema.builder().courseId(savedCourse.getId()).build()))).getSchema());
-            return courseMapper.courseToCourseDto(courseRepository.save(savedCourse));
+            return courseMapper.courseToCourseDto(courseRepository.save(courses));
         }
         throw new IllegalArgumentException("Курс не валиден");
     }
@@ -79,6 +76,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseDto updateCourse(CourseUpdateDto courseUpdateDto, Long userId, boolean admin) {
         if (courseUpdateDto != null) {
+            log.info("Update course {}", courseUpdateDto.getId());
             Courses courses = courseRepository.findById(courseUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
             if (admin || courses.getUserCreated().getId().equals(userId)) {
                 ofNullable(courseUpdateDto.getCourseName()).ifPresent(courses::setCourseName);
@@ -96,6 +94,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(Long id, Long userId, boolean admin) {
+
+        log.info("Delete course {}", id);
+
         Courses courses = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Курс не найден"));
         if (admin || courses.getUserCreated().getId().equals(userId)) {
             courses.setDeleted(true);
@@ -111,14 +112,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<ResponseExecuteSql> executeSqlInCourse(ExecuteSqlDto requestExecuteSql, Long userId, boolean admin) {
+
+        log.info("Execute sql");
+
         Courses courses = courseRepository.findById(requestExecuteSql.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
-        boolean adminSql = admin || courses.getUserCreated().getId().equals(userId);
-        return (List<ResponseExecuteSql>) rabbitTemplate.convertSendAndReceive("execute",RequestExecuteSql
-                .builder()
-                .admin(adminSql)
-                .userId(userId)
-                .schema(courses.getSchema())
-                .userSql(requestExecuteSql.getUserSql())
-                .build());
+        if(courses.getSchema() != null) {
+            boolean adminSql = admin || courses.getUserCreated().getId().equals(userId);
+            return (List<ResponseExecuteSql>) rabbitTemplate.convertSendAndReceive("execute", RequestExecuteSql
+                    .builder()
+                    .admin(adminSql)
+                    .userId(userId)
+                    .schema(courses.getSchema())
+                    .userSql(requestExecuteSql.getUserSql())
+                    .build());
+        } else {
+            throw new ForbiddenException("Создайте задачу по sql");
+        }
     }
 }

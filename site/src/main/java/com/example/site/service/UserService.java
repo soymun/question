@@ -13,6 +13,8 @@ public interface UserService extends UserDetailsService {
 
     UserDto saveUser(UserCreateDto userCreateDto);
 
+    Pair<Long, Role> getUserRole(String email);
+
     UserDto updateUser(UserUpdateDto userUpdateDto);
 
     void deleteUser(Long id);
