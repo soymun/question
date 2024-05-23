@@ -1,8 +1,9 @@
-package com.example.site.model;
+package com.example.site.model.util;
 
 public enum CourseType {
 
-    USUALLY("USUALLY"), TIMED("TIMED");
+    USUALLY("USUALLY"),
+    TIMED("TIMED");
 
     final String value;
 

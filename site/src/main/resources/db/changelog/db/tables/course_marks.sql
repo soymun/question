@@ -9,7 +9,10 @@ create table courses.course_marks
             references courses.courses,
     id         bigserial
         primary key,
-    mark       bigint
+    user_id bigint constraint user_fk references courses.users,
+    mark       bigint,
+    create_time timestamptz,
+    update_time timestamptz
 );
 
 alter table courses.course_marks

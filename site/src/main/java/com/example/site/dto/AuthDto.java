@@ -1,6 +1,6 @@
 package com.example.site.dto;
 
-import com.example.site.model.Role;
+import com.example.site.model.util.Role;
 import lombok.Data;
 
 @Data

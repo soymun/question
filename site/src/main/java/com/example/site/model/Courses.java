@@ -1,12 +1,15 @@
 package com.example.site.model;
 
+import com.example.site.model.util.CourseType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,15 +40,22 @@ public class Courses {
     @Fetch(FetchMode.JOIN)
     private User userCreated;
 
-    private LocalDate timeCreated;
-
     private String schema;
 
     private Boolean open;
 
     private Boolean deleted;
 
+    @Column(name = "time_execute")
     private LocalDateTime timeExecute;
+
+    @CreationTimestamp
+    @Column(name = "create_time")
+    private LocalDateTime createTime;
+
+    @UpdateTimestamp
+    @Column(name = "update_time")
+    private LocalDateTime updateTime;
 
     public Courses(Long id) {
         this.id = id;

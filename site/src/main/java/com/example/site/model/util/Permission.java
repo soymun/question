@@ -1,8 +1,10 @@
-package com.example.site.model;
+package com.example.site.model.util;
 
 public enum Permission {
 
-    USER("USER"), TEACHER("TEACHER"), ADMIN("ADMIN");
+    USER("USER"),
+    TEACHER("TEACHER"),
+    ADMIN("ADMIN");
 
     final String value;
 

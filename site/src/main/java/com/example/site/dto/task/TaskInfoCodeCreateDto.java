@@ -1,6 +1,6 @@
 package com.example.site.dto.task;
 
-import com.example.site.model.CodeType;
+import com.example.site.model.DcCodeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class TaskInfoCodeCreateDto {
 
     @NotNull
     @Schema(description = "Тип кода")
-    private CodeType codeType;
+    private DcCodeType codeType;
 
     @Schema(description = "Код инициализации")
     private String initCode;

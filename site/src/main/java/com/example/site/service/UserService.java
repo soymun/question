@@ -1,7 +1,7 @@
 package com.example.site.service;
 
 import com.example.site.dto.user.*;
-import com.example.site.model.Role;
+import com.example.site.model.util.Role;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UserDetailsService;
 

@@ -1,5 +1,6 @@
 package com.example.site.model;
 
+import com.example.site.model.util.TaskType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

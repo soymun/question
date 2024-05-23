@@ -20,6 +20,8 @@ databaseChangeLog:
   - include:
       file: classpath:/db/changelog/db/tables/task_history_result.sql
   - include:
+      file: classpath:/db/changelog/db/tables/dc_code_type.sql
+  - include:
       file: classpath:/db/changelog/db/tables/task_info_code.sql
   - include:
       file: classpath:/db/changelog/db/tables/task_info_question_box.sql
@@ -31,5 +33,9 @@ databaseChangeLog:
       file: classpath:/db/changelog/db/tables/reports.sql
   - include:
       file: classpath:/db/changelog/db/tables/remote_service.sql
+  - include:
+      file: classpath:/db/changelog/db/tables/user_remote_service.sql
+  - include:
+      file: classpath:/db/changelog/db/tables/dc_report_param_type.sql
   - includeAll:
       path: classpath:/db/changelog/db/insert/

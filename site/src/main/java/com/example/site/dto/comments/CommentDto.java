@@ -20,5 +20,5 @@ public class CommentDto {
     private String message;
 
     @Schema(description = "Дата создания")
-    private LocalDateTime time;
+    private LocalDateTime createTime;
 }

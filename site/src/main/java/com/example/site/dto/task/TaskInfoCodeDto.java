@@ -1,6 +1,6 @@
 package com.example.site.dto.task;
 
-import com.example.site.model.CodeType;
+import com.example.site.dto.dccodetype.DcCodeTypeDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class TaskInfoCodeDto {
     private Long task;
 
     @Schema(description = "Тип")
-    private CodeType codeType;
+    private DcCodeTypeDto codeType;
 
     @Schema(description = "Код")
     private String initCode;

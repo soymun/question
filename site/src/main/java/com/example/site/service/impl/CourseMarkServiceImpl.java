@@ -5,6 +5,7 @@ import com.example.site.dto.marks.MarkDto;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.CourseMarkMapper;
 import com.example.site.model.CourseMarks;
+import com.example.site.model.User;
 import com.example.site.repository.CourseMarksRepository;
 import com.example.site.repository.UserCourseRepository;
 import com.example.site.service.CourseMarksService;
@@ -27,16 +28,20 @@ public class CourseMarkServiceImpl implements CourseMarksService {
     private final CourseMarkMapper courseMarkMapper;
 
     @Override
-    public MarkDto saveMark(MarkCreateDto markCreateDto) {
+    public MarkDto saveMark(MarkCreateDto markCreateDto, Long id) {
         if(markCreateDto != null){
 
             log.info("Create mark at courses {}", markCreateDto.getCourses());
 
-            CourseMarks courseMarks = courseMarksRepository.save(courseMarkMapper.markCreateDtoToCourseMarks(markCreateDto));
+            CourseMarks courseMarks = courseMarkMapper.markCreateDtoToCourseMarks(markCreateDto);
 
-            userCourseRepository.saveAll(userCourseRepository.getUserCourseByCountTask(courseMarks.getCountTask(), courseMarks.getCourses().getId()).stream().peek(u -> u.setCourseMarks(courseMarks)).toList());
+            courseMarks.setUserCreated(new User(id));
 
-            return courseMarkMapper.courseMarkToMarkDto(courseMarks);
+            CourseMarks courseMarksSaved = courseMarksRepository.save(courseMarks);
+
+            userCourseRepository.saveAll(userCourseRepository.getUserCourseByCountTask(courseMarksSaved.getCountTask(), courseMarksSaved.getCourses().getId()).stream().peek(u -> u.setCourseMarks(courseMarksSaved)).toList());
+
+            return courseMarkMapper.courseMarkToMarkDto(courseMarksSaved);
 
         }
         throw new IllegalArgumentException("Не валидные данные");

@@ -1,6 +1,6 @@
 package com.example.site.dto.course;
 
-import com.example.site.model.CourseType;
+import com.example.site.model.util.CourseType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

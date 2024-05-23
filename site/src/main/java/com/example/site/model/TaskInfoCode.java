@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @AllArgsConstructor
@@ -22,7 +24,10 @@ public class TaskInfoCode {
     @JoinColumn(name = "task_id")
     private Task task;
 
-    private CodeType codeType;
+    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code_type", nullable = false)
+    private DcCodeType codeType;
 
     private String initCode;
 
