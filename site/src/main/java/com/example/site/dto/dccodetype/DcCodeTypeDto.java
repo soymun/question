@@ -1,9 +1,9 @@
-package com.example.site.dto.report;
+package com.example.site.dto.dccodetype;
 
 import lombok.Data;
 
 @Data
-public class ReportAllDto {
+public class DcCodeTypeDto {
 
     private Long id;
 

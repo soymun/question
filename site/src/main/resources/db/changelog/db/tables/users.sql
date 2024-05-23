@@ -18,7 +18,9 @@ create table courses.users
     first_name  varchar(255),
     password    varchar(255),
     patronymic  varchar(255),
-    second_name varchar(255)
+    second_name varchar(255),
+    create_time timestamptz,
+    update_time timestamptz
 );
 
 alter table courses.users

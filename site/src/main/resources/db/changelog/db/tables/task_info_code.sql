@@ -2,9 +2,7 @@
 --changeset soymun:10
 create table courses.task_info_code
 (
-    code_type   smallint
-        constraint task_info_code_code_type_check
-            check ((code_type >= 0) AND (code_type <= 1)),
+    code_type   bigint constraint dc_code_type_fk references courses.dc_code_type,
     id          bigserial
         primary key,
     task_id     bigint

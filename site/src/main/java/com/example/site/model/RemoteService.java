@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,9 +24,20 @@ public class RemoteService {
 
     private String name;
 
-    @Column(name = "remote_key")
+    @Column(name = "remote_url", nullable = false)
+    private String remoteUrl;
+
+    @Column(name = "remote_key", nullable = false)
     private String remoteKey;
 
-    @Column(name = "remote_header")
+    @Column(name = "remote_header", nullable = false)
     private String remoteHeader;
+
+    @CreationTimestamp
+    @Column(name = "create_time")
+    private LocalDateTime createTime;
+
+    @UpdateTimestamp
+    @Column(name = "update_time")
+    private LocalDateTime updateTime;
 }

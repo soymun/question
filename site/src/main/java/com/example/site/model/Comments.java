@@ -33,7 +33,8 @@ public class Comments {
 
     private String message;
 
-    private LocalDateTime time;
+    @Column(name = "create_time")
+    private LocalDateTime createTime;
 
     private Boolean apply;
 }

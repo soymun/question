@@ -4,7 +4,7 @@ import com.example.site.dto.AuthDto;
 import com.example.site.dto.ResultDto;
 import com.example.site.dto.user.LoginDto;
 import com.example.site.dto.user.UserCreateDto;
-import com.example.site.model.Role;
+import com.example.site.model.util.Role;
 import com.example.site.security.JwtTokenProvider;
 import com.example.site.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor

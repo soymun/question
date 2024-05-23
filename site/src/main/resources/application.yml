@@ -25,6 +25,6 @@ minio:
   endpoint: http://localhost:9000
 jwt:
   token:
-    security: soymun
+    security: 1932485710938450193450SKJDHTO3UI2H456KJ3ND8EGU7YOI213J4N51058U4HJDSNFH9183Y45UT1U345
     validate: 3600000
     refresh: 999999999

@@ -7,8 +7,8 @@ import com.example.site.dto.course.ExecuteSqlDto;
 import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.CourseMapper;
-import com.example.site.model.CourseType;
 import com.example.site.model.Courses;
+import com.example.site.model.util.CourseType;
 import com.example.site.repository.CourseRepository;
 import com.example.site.service.CourseService;
 import dto.RequestExecuteSql;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -64,7 +63,6 @@ public class CourseServiceImpl implements CourseService {
 
             Courses courses = courseMapper.courseCreateDtoToCourse(courseCreateDto);
             courses.setDeleted(false);
-            courses.setTimeCreated(LocalDate.now());
             if (CourseType.USUALLY.equals(courses.getCourseType())) {
                 courses.setTimeExecute(null);
             }
@@ -116,7 +114,7 @@ public class CourseServiceImpl implements CourseService {
         log.info("Execute sql");
 
         Courses courses = courseRepository.findById(requestExecuteSql.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
-        if(courses.getSchema() != null) {
+        if (courses.getSchema() != null) {
             boolean adminSql = admin || courses.getUserCreated().getId().equals(userId);
             return (List<ResponseExecuteSql>) rabbitTemplate.convertSendAndReceive("execute", RequestExecuteSql
                     .builder()

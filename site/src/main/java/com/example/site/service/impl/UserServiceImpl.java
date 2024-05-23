@@ -4,13 +4,15 @@ import com.example.site.dto.user.*;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.UserMapper;
 import com.example.site.model.Groups;
-import com.example.site.model.Role;
+import com.example.site.model.util.Role;
 import com.example.site.model.User;
 import com.example.site.repository.UserRepository;
 import com.example.site.security.UserDetailImpl;
 import com.example.site.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
             log.info("Authorization user {}", findUser.getId());
 
-            return new UserDetailImpl(findUser.getId(), findUser.getEmail(), findUser.getPassword(), findUser.getRole().getAuthority(), findUser.getActive());
+            return new UserDetailImpl(findUser.getId(), findUser.getEmail(), findUser.getPassword(),findUser.getRole(), findUser.getRole().getAuthority(), findUser.getActive());
         } else {
             throw new NotFoundException("Пользователь не найден");
         }
@@ -61,6 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable("emails")
     public Pair<Long, Role> getUserRole(String email) {
         Optional<User> findUser = userRepository.findUserByEmail(email);
         if(findUser.isPresent()){
@@ -104,6 +107,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict("emails")
     public void deleteUser(Long id) {
 
         log.info("Delete user");

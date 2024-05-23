@@ -1,4 +1,4 @@
 package com.example.site.model;
 
-public class ParamType {
+public class TaskInfoFile {
 }

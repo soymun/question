@@ -1,6 +1,6 @@
 package com.example.site.dto.task;
 
-import com.example.site.model.TaskType;
+import com.example.site.model.util.TaskType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

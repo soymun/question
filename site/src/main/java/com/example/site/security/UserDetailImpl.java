@@ -1,5 +1,6 @@
 package com.example.site.security;
 
+import com.example.site.model.util.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ public class UserDetailImpl implements UserDetails {
     private String email;
 
     private String password;
+
+    private Role role;
 
     private List<? extends GrantedAuthority> grantedAuthorities;
 

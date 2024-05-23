@@ -1,9 +1,10 @@
 package com.example.site.dto.course;
 
 import com.example.site.dto.user.UserInclude;
-import com.example.site.model.CourseType;
+import com.example.site.model.util.CourseType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,7 +32,10 @@ public class CourseDto {
     private UserInclude userCreated;
 
     @Schema(description = "Дата создания")
-    private LocalDate timeCreated;
+    private LocalDateTime create;
+
+    @Schema(description = "Дата обновления")
+    private LocalDateTime update;
 
     @Schema(description = "Дата закрытия")
     private LocalDateTime timeExecute;

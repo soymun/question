@@ -1,6 +1,6 @@
 package com.example.site.security;
 
-import com.example.site.model.Role;
+import com.example.site.model.util.Role;
 import com.example.site.service.impl.UserServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

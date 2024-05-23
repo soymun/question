@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
         Comments comments = commentMapper.commentCreateDtoToComment(commentCreateDto);
 
         comments.setApply(false);
-        comments.setTime(LocalDateTime.now());
+        comments.setCreateTime(LocalDateTime.now());
 
         return commentMapper.commentToCommentDto(commentRepository.save(comments));
     }

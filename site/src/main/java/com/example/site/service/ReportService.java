@@ -1,24 +1,27 @@
 package com.example.site.service;
 
-import com.example.site.dto.report.ReportAllDto;
-import com.example.site.dto.report.ReportCreateDto;
-import com.example.site.dto.report.ReportDto;
-import com.example.site.dto.report.ReportUpdateDto;
+import com.example.site.dto.report.*;
+import com.example.site.model.util.Role;
+import io.minio.errors.*;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.core.io.Resource;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface ReportService {
 
-    void saveReport(ReportCreateDto reportCreateDto);
+    ReportDto saveReport(ReportCreateDto reportCreateDto);
 
-    Resource makeReports(Long id);
+    Resource makeReports(ReportInitDto reportInitDto) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, JRException, ClassNotFoundException;
 
-    void updateReport(ReportUpdateDto reportUpdateDto);
+    ReportDto updateReport(ReportUpdateDto reportUpdateDto);
 
     void deleteReport(Long id);
 
-    List<ReportAllDto> getAllReport();
+    List<ReportDto> getAllReport(Role role);
 
-    ReportDto getById(Long id);
+    ReportDto getById(Long id, Role role);
 }

@@ -17,7 +17,9 @@ create table courses.courses
     path_image   varchar(255),
     open boolean default false,
     deleted boolean default false,
-    schema       varchar(255)
+    schema       varchar(255),
+    create_time timestamptz,
+    update_time timestamptz
 );
 
 alter table courses.courses

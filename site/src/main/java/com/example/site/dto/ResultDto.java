@@ -1,5 +1,6 @@
 package com.example.site.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @Data
 public class ResultDto<T> {
 
+    @Schema(description = "Значение")
     private T data;
 
     private List<String> errors = new ArrayList<>();

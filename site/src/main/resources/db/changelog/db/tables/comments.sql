@@ -12,7 +12,8 @@ create table courses.comments
     user_id bigint
         constraint user_fk
             references courses.users,
-    message varchar(255)
+    message varchar(255),
+    create_time timestamptz
 );
 
 alter table courses.comments

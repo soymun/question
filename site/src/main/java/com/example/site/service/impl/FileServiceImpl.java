@@ -26,6 +26,8 @@ public class FileServiceImpl implements FileService {
     @Override
     public String uploadFile(MultipartFile multipartFile, String bucket) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
+        log.info("File upload {}", multipartFile.getName());
+
         String[] type = multipartFile.getName().split("\\.");
 
         String random = UUID.randomUUID() + type[type.length-1];

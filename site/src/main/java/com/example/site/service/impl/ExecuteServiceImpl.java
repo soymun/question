@@ -187,7 +187,7 @@ public class ExecuteServiceImpl implements ExecuteService {
                     .userId(id)
                     .build();
 
-            rabbitTemplate.convertAndSend(taskInfoCode.getCodeType().name(), codeExecuteRequest);
+            rabbitTemplate.convertAndSend(taskInfoCode.getCodeType().getName(), codeExecuteRequest);
 
             userTaskRepository.save(userTask);
         } else {
