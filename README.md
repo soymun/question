@@ -1,4 +1,4 @@
-<Configuration>
+""<Configuration>
 
   <Add OfficeClientEdition="64" Channel="PerpetualVL2021">
     <Product ID="ProPlus2021Volume">
@@ -15,4 +15,4 @@
   <Remove All="True" />
 
 
-</Configuration>
+</Configuration>""
