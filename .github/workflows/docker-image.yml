@@ -1,0 +1,32 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Login to Docker Hub
+      uses: docker/login-action@v4
+      with:
+        username: ${{ vars.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - uses: actions/checkout@v4
+    - name: Execute sql build
+      run: docker build ./execute-sql/ --file Dockerfile --tag execute-sql:lates
+
+    - uses: actions/checkout@v4
+    - name: Java execute build
+      run: docker build ./java-execute/ --file Dockerfile --tag java-exxecute:lates
+
+    - uses: actions/checkout@v4
+    - name: Site build
+      run: docker build ./site/ --file Dockerfile --tag site:lates
