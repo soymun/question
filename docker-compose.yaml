@@ -1,10 +1,7 @@
 version: "1"
 services:
   question:
-    image: site:1.0.0
-    build:
-      context: ./site/
-      dockerfile: Dockerfile
+    image: soymun/site:latest
     depends_on:
       - postgres_db
       - rabbitmq
@@ -22,10 +19,7 @@ services:
     restart: unless-stopped
 
   sql:
-    image: sql:1.0.0
-    build:
-      context: ./execute-sql/
-      dockerfile: Dockerfile
+    image: soymun/execute-sql:latest
     depends_on:
       - postgres_db
       - rabbitmq
@@ -43,10 +37,7 @@ services:
     restart: unless-stopped
 
   java-execute:
-    image: java-execute:1.0.0
-    build:
-      context: ./java-execute/
-      dockerfile: Dockerfile
+    image: soymun/java-execute:latest
     depends_on:
       - question
     networks:

@@ -24,6 +24,11 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private static final String[] AUTH_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
+
     @Bean
     public SecurityFilterChain security(HttpSecurity httpSecurity) throws Exception {
 
@@ -36,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/refresh").permitAll()
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users").hasAuthority("TEACHER")
                         .requestMatchers(HttpMethod.GET, "/users/groups/{id}").hasAuthority("TEACHER")
