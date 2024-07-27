@@ -20,12 +20,12 @@ jobs:
 
     - uses: actions/checkout@v4
     - name: Execute sql build
-      run: docker build ./execute-sql/ --file Dockerfile --tag execute-sql:lates
+      run: docker build ./execute-sql/ --file Dockerfile --tag execute-sql:latest
 
     - uses: actions/checkout@v4
     - name: Java execute build
-      run: docker build ./java-execute/ --file Dockerfile --tag java-exxecute:lates
+      run: docker build ./java-execute/ --file Dockerfile --tag java-execute:latest
 
     - uses: actions/checkout@v4
     - name: Site build
-      run: docker build ./site/ --file Dockerfile --tag site:lates
+      run: docker build ./site/ --file Dockerfile --tag site:latest
