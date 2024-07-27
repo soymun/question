@@ -32,18 +32,18 @@ jobs:
         with:
           context: ./execute-sql/
           push: true
-          tags: execute-sql:latest
+          tags: soymun/execute-sql:latest
 
       - name: Build and push java execute
         uses: docker/build-push-action@v6
         with:
           context: ./java-execute/
           push: true
-          tags: java-execute:latest
+          tags: soymun/java-execute:latest
 
       - name: Build and push site
         uses: docker/build-push-action@v6
         with:
           context: ./site/
           push: true
-          tags: site:latest
+          tags: soymun/site:latest
