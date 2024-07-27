@@ -1,9 +1,7 @@
 package com.example.javaexecute.workers;
 
+import com.example.javaexecute.dto.*;
 import com.example.javaexecute.service.impl.JavaExecuteServiceImpl;
-import dto.CodeExecuteRequest;
-import dto.CodeExecuteResponse;
-import dto.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

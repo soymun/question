@@ -1,6 +1,7 @@
 package com.example.javaexecute.service;
 
-import dto.*;
+
+import com.example.javaexecute.dto.*;
 
 public interface JavaExecuteService {
 
