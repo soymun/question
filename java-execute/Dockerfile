@@ -1,4 +1,7 @@
+FROM maven:3.9.8-amazoncorretto-17-debian AS build
+COPY . .
+RUN mvn clean package
+
 FROM openjdk:17
-ARG JAR_FILE=./target/java-execute-0.0.1-SNAPSHOT.jar
-COPY ${JAR_FILE} shop.jar
-ENTRYPOINT ["java","-jar","/shop.jar"]
+COPY --from=build /target/*.jar /app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]

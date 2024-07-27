@@ -1,4 +1,4 @@
-package dto;
+package com.example.executesqlscriptsmicroservice.dto;
 
 public enum Status {
 

@@ -1,14 +1,12 @@
 package com.example.site.workers;
 
+import com.example.site.dto.*;
 import com.example.site.exception.NotFoundException;
 import com.example.site.model.CourseMarks;
 import com.example.site.model.TaskHistoryResult;
 import com.example.site.model.UserCourse;
 import com.example.site.model.UserTask;
 import com.example.site.repository.*;
-import dto.CodeExecuteResponse;
-import dto.ResponseCheckSql;
-import dto.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

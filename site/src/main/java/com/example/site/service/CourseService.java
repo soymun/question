@@ -1,11 +1,10 @@
 package com.example.site.service;
 
+import com.example.site.dto.ResponseExecuteSql;
 import com.example.site.dto.course.CourseCreateDto;
 import com.example.site.dto.course.CourseDto;
 import com.example.site.dto.course.CourseUpdateDto;
 import com.example.site.dto.course.ExecuteSqlDto;
-import dto.RequestExecuteSql;
-import dto.ResponseExecuteSql;
 
 import java.util.List;
 

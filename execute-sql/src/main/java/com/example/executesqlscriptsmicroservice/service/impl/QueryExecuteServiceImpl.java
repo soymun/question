@@ -1,7 +1,7 @@
 package com.example.executesqlscriptsmicroservice.service.impl;
 
+import com.example.executesqlscriptsmicroservice.dto.*;
 import com.example.executesqlscriptsmicroservice.service.QueryExecuteService;
-import dto.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Query;

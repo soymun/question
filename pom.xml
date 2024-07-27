@@ -21,7 +21,6 @@
     <modules>
         <module>site</module>
         <module>execute-sql</module>
-        <module>dtos</module>
         <module>java-execute</module>
     </modules>
 

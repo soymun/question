@@ -1,12 +1,12 @@
 package com.example.site.rest;
 
+import com.example.site.dto.ResponseExecuteSql;
 import com.example.site.dto.ResultDto;
 import com.example.site.dto.course.CourseCreateDto;
 import com.example.site.dto.course.CourseDto;
 import com.example.site.dto.course.CourseUpdateDto;
 import com.example.site.dto.course.ExecuteSqlDto;
 import com.example.site.service.impl.CourseServiceImpl;
-import dto.ResponseExecuteSql;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

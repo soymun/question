@@ -1,5 +1,6 @@
 package com.example.site.service.impl;
 
+import com.example.site.dto.*;
 import com.example.site.dto.task.*;
 import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
@@ -7,8 +8,6 @@ import com.example.site.mappers.TaskMapper;
 import com.example.site.model.*;
 import com.example.site.repository.*;
 import com.example.site.service.ExecuteService;
-import dto.CodeExecuteRequest;
-import dto.RequestCheckSql;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

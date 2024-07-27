@@ -1,4 +1,4 @@
-package dto;
+package com.example.executesqlscriptsmicroservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,13 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RequestExecuteSql {
+public class ResponseCreateSchema {
+
+    private Long courseId;
 
     private String schema;
-
-    private String userSql;
-
-    private Long userId;
-
-    private Boolean admin;
 }

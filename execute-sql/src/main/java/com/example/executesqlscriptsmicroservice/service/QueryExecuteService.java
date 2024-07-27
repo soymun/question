@@ -1,7 +1,9 @@
 package com.example.executesqlscriptsmicroservice.service;
 
 
-import dto.*;
+
+
+import com.example.executesqlscriptsmicroservice.dto.*;
 
 import java.util.List;
 

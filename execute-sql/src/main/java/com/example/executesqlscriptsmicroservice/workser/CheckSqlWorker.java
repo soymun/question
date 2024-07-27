@@ -2,10 +2,8 @@ package com.example.executesqlscriptsmicroservice.workser;
 
 import com.example.executesqlscriptsmicroservice.chain.Context;
 import com.example.executesqlscriptsmicroservice.chain.UtilProcess;
+import com.example.executesqlscriptsmicroservice.dto.*;
 import com.example.executesqlscriptsmicroservice.service.impl.QueryExecuteServiceImpl;
-import dto.RequestCheckSql;
-import dto.ResponseCheckSql;
-import dto.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

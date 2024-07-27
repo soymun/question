@@ -1,5 +1,6 @@
 package com.example.site.service.impl;
 
+import com.example.site.dto.*;
 import com.example.site.dto.course.CourseCreateDto;
 import com.example.site.dto.course.CourseDto;
 import com.example.site.dto.course.CourseUpdateDto;
@@ -11,8 +12,6 @@ import com.example.site.model.Courses;
 import com.example.site.model.util.CourseType;
 import com.example.site.repository.CourseRepository;
 import com.example.site.service.CourseService;
-import dto.RequestExecuteSql;
-import dto.ResponseExecuteSql;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
