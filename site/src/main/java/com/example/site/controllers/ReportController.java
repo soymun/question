@@ -1,4 +1,4 @@
-package com.example.site.rest;
+package com.example.site.controllers;
 
 import com.example.site.dto.ResultDto;
 import com.example.site.dto.report.ReportCreateDto;

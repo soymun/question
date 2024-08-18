@@ -9,6 +9,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -37,6 +39,20 @@ public class Task {
     @Fetch(FetchMode.JOIN)
     private Courses courses;
 
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskInfoCode> taskInfoCode;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskInfoQuestionBox> taskInfoQuestionBox;
+
+    @OneToOne(mappedBy = "task", cascade = CascadeType.ALL)
+    @Fetch(FetchMode.JOIN)
+    private TaskInfoQuestionText taskInfoQuestionText;
+
+    @OneToOne(mappedBy = "task", cascade = CascadeType.ALL)
+    @Fetch(FetchMode.JOIN)
+    private TaskInfoSql taskInfoSql;
+
     @Column(name = "all_attempt")
     private Long allAttempt;
 
@@ -46,6 +62,7 @@ public class Task {
     private Boolean deleted;
 
     private Boolean open;
+
     public Task(Long id) {
         this.id = id;
     }

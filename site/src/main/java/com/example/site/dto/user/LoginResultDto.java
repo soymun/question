@@ -12,7 +12,7 @@ import java.util.Map;
 public class LoginResultDto {
 
     @Schema(description = "Результат")
-    Map<String, Object> data;
+    private Map<String, Object> data;
 
     private List<String> errors = new ArrayList<>();
 }

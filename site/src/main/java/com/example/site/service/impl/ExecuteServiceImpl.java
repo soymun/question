@@ -1,13 +1,13 @@
 package com.example.site.service.impl;
 
-import com.example.site.dto.*;
+import com.example.site.dto.CodeExecuteRequest;
+import com.example.site.dto.RequestCheckSql;
 import com.example.site.dto.task.*;
 import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.TaskMapper;
 import com.example.site.model.*;
 import com.example.site.repository.*;
-import com.example.site.service.ExecuteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,12 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class ExecuteServiceImpl implements ExecuteService {
+public class ExecuteServiceImpl {
 
     private final TaskHistoryResultRepository taskHistoryResultRepository;
 
@@ -48,14 +49,38 @@ public class ExecuteServiceImpl implements ExecuteService {
 
     private final TaskRepository taskRepository;
 
-    public void executeSql(ExecuteSqlDto executeSqlDto, Long id) {
+    public ResultExecute execute(ExecuteDto executeDto, Long id) {
 
-        if (courseRepository.getPredicateCourse(executeSqlDto.getTaskId())) {
+        Optional<Task> optionalTask = taskRepository.findById(executeDto.getTaskId());
+
+        if (optionalTask.isPresent()) {
+
+            Task task = optionalTask.get();
+
+            return switch (task.getTaskType()) {
+                case NONE, FILE -> new ResultExecute();
+                case SQL -> executeSql(executeDto.getExecuteSqlDto(), executeDto.getTaskId(), id);
+                case QUESTION_BOX_ONE, QUESTION_BOX_MULTI ->
+                        executeBox(executeDto.getExecuteBoxDto(), executeDto.getTaskId(), id);
+                case QUESTION_TEXT -> executeText(executeDto.getExecuteTextDto(), executeDto.getTaskId(), id);
+                case CODE -> executeCode(executeDto.getExecuteCodeDto(), executeDto.getTaskId(), id);
+            };
+
+        } else {
+            throw new NotFoundException("Задача не найдена");
+        }
+    }
+
+    private ResultExecute executeSql(ExecuteSqlDto executeSqlDto, Long taskId, Long id) {
+
+        Boolean predicate = courseRepository.getPredicateCourse(taskId);
+
+        if (predicate == null || predicate)  {
             log.info("Execute info sql");
 
-            TaskInfoSql taskInfoSql = taskInfoSqlRepository.getByTaskId(executeSqlDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+            TaskInfoSql taskInfoSql = taskInfoSqlRepository.getByTaskId(taskId).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
-            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeSqlDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, taskId).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
             taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
@@ -79,23 +104,26 @@ public class ExecuteServiceImpl implements ExecuteService {
 
             userTask.setAttempt(userTask.getAttempt() + 1);
             userTaskRepository.save(userTask);
-            taskRepository.updateAllAttempt(executeSqlDto.getTaskId());
+            taskRepository.updateAllAttempt(taskId);
         } else {
             throw new ForbiddenException("Задача закрыта");
         }
+        return new ResultExecute();
     }
 
-    public ResultExecute executeText(ExecuteTextDto executeBoxDto, Long id) {
+    private ResultExecute executeText(ExecuteTextDto executeBoxDto, Long taskId, Long id) {
 
-        if (courseRepository.getPredicateCourse(executeBoxDto.getTaskId())) {
-            taskRepository.updateAllAttempt(executeBoxDto.getTaskId());
+        Boolean predicate = courseRepository.getPredicateCourse(taskId);
+
+        if (predicate == null || predicate)  {
+            taskRepository.updateAllAttempt(taskId);
             log.info("Execute info text");
 
-            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, taskId).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             userTask.setAttempt(userTask.getAttempt() + 1);
 
-            TaskInfoQuestionText answer = taskInfoQuestionTextRepository.findByTaskId(executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+            TaskInfoQuestionText answer = taskInfoQuestionTextRepository.findByTaskId(taskId).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
             taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
@@ -112,24 +140,26 @@ public class ExecuteServiceImpl implements ExecuteService {
 
                 return taskMapper.taskHistoryResultToResultExecute(savedResult);
             } else {
-                return getResultExecute(userTask, taskHistoryResult, executeBoxDto.getTaskId());
+                return getResultExecute(userTask, taskHistoryResult, taskId);
             }
         } else {
             throw new ForbiddenException("Задача закрыта");
         }
     }
 
-    public ResultExecute executeBox(ExecuteBoxDto executeBoxDto, Long id) {
+    private ResultExecute executeBox(ExecuteBoxDto executeBoxDto, Long taskId, Long id) {
 
-        if (courseRepository.getPredicateCourse(executeBoxDto.getTaskId())) {
-            taskRepository.updateAllAttempt(executeBoxDto.getTaskId());
+        Boolean predicate = courseRepository.getPredicateCourse(taskId);
+
+        if (predicate == null || predicate) {
+            taskRepository.updateAllAttempt(taskId);
             log.info("Execute info box");
 
-            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, executeBoxDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, taskId).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             userTask.setAttempt(userTask.getAttempt() + 1);
 
-            List<Long> listRightAnswerIds = taskInfoQuestionBoxRepository.getRightAnswerByTaskId(executeBoxDto.getTaskId());
+            List<Long> listRightAnswerIds = taskInfoQuestionBoxRepository.getRightAnswerByTaskId(taskId);
 
             TaskHistoryResult taskHistoryResult = new TaskHistoryResult();
             taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
@@ -146,20 +176,22 @@ public class ExecuteServiceImpl implements ExecuteService {
 
                 return taskMapper.taskHistoryResultToResultExecute(savedResult);
             } else {
-                return getResultExecute(userTask, taskHistoryResult, executeBoxDto.getTaskId());
+                return getResultExecute(userTask, taskHistoryResult, taskId);
             }
         } else {
             throw new ForbiddenException("Задача закрыта");
         }
     }
 
-    public void executeCode(ExecuteCodeDto executeCodeDto, Long id) {
+    private ResultExecute executeCode(ExecuteCodeDto executeCodeDto,Long taskId, Long id) {
 
-        if (courseRepository.getPredicateCourse(executeCodeDto.getTaskId())) {
-            taskRepository.updateAllAttempt(executeCodeDto.getTaskId());
+        Boolean predicate = courseRepository.getPredicateCourse(taskId);
+
+        if (predicate == null || predicate)  {
+            taskRepository.updateAllAttempt(taskId);
             log.info("Execute code in user {}", id);
 
-            TaskInfoCode taskInfoCode = taskInfoCodeRepository.findById(executeCodeDto.getTaskId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
+            TaskInfoCode taskInfoCode = taskInfoCodeRepository.getTaskInfoCodesByTaskIdAndCodeTypeId(taskId, executeCodeDto.getDcCodeTypeDto().getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
             UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(id, taskInfoCode.getTask().getId()).orElseThrow(() -> new NotFoundException("Задача не найдена"));
 
@@ -192,6 +224,8 @@ public class ExecuteServiceImpl implements ExecuteService {
         } else {
             throw new ForbiddenException("Задача закрыта");
         }
+
+        return new ResultExecute();
     }
 
     private ResultExecute getResultExecute(UserTask userTask, TaskHistoryResult taskHistoryResult, Long taskId) {

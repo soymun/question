@@ -29,98 +29,106 @@ public class QueryExecuteServiceImpl implements QueryExecuteService {
     public ResponseCheckSql checkSelectSql(RequestCheckSql requestCheckSql) {
         log.info("Check simple SELECT sql with taskUser - {}", requestCheckSql.getTaskUserId());
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        setSchema(entityManager, requestCheckSql.getSchema());
-
-        entityManager.getTransaction().begin();
-
-        List<Map<String, Object>> userResult;
-
-        long executeTime = 0L;
-
         try {
-            Pair<List<Map<String, Object>>, Long> result = processSelectSql(entityManager, requestCheckSql.getUserSql());
-            userResult = result.getFirst();
-            executeTime = result.getSecond();
-        } catch (Exception e) {
+            setSchema(entityManager, requestCheckSql.getSchema());
+
+            entityManager.getTransaction().begin();
+
+            List<Map<String, Object>> userResult;
+
+            long executeTime = 0L;
+
+            try {
+                Pair<List<Map<String, Object>>, Long> result = processSelectSql(entityManager, requestCheckSql.getUserSql());
+                userResult = result.getFirst();
+                executeTime = result.getSecond();
+            } catch (Exception e) {
+                entityManager.getTransaction().rollback();
+                return ResponseCheckSql
+                        .builder()
+                        .taskUserId(requestCheckSql.getTaskUserId())
+                        .status(Status.ERROR)
+                        .message(e.getMessage())
+                        .build();
+            }
+
             entityManager.getTransaction().rollback();
-            return ResponseCheckSql
-                    .builder()
-                    .taskUserId(requestCheckSql.getTaskUserId())
-                    .status(Status.ERROR)
-                    .message(e.getMessage())
-                    .build();
+
+            entityManager.getTransaction().begin();
+
+            List<Map<String, Object>> mainResult = null;
+            try {
+                mainResult = processSelectSql(entityManager, requestCheckSql.getCheckSql()).getFirst();
+            } catch (Exception ignored) {
+
+            }
+
+            entityManager.getTransaction().rollback();
+
+            return checkAndSet(requestCheckSql.getTaskUserId(), userResult, mainResult, executeTime);
+        } finally {
+            entityManager.close();
         }
-
-        entityManager.getTransaction().rollback();
-
-        entityManager.getTransaction().begin();
-
-        List<Map<String, Object>> mainResult = null;
-        try {
-            mainResult = processSelectSql(entityManager, requestCheckSql.getCheckSql()).getFirst();
-        } catch (Exception ignored) {
-
-        }
-
-        entityManager.getTransaction().rollback();
-
-        return checkAndSet(requestCheckSql.getTaskUserId(), userResult, mainResult, executeTime);
     }
 
     @Override
     public ResponseCheckSql checkSql(RequestCheckSql requestCheckSql) {
         log.info("Check sql with taskUser - {}", requestCheckSql.getTaskUserId());
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        setSchema(entityManager, requestCheckSql.getSchema());
-
-        entityManager.getTransaction().begin();
-
-        List<Map<String, Object>> userResult = null;
-
-        long executeTime = 0L;
-
         try {
-            Date start = new Date();
-            entityManager.createNativeQuery(requestCheckSql.getUserSql()).executeUpdate();
-            Date end = new Date();
-            executeTime = end.getTime() - start.getTime();
-        } catch (Exception e) {
+            setSchema(entityManager, requestCheckSql.getSchema());
+
+            entityManager.getTransaction().begin();
+
+            List<Map<String, Object>> userResult = null;
+
+            long executeTime = 0L;
+
+            try {
+                Date start = new Date();
+                entityManager.createNativeQuery(requestCheckSql.getUserSql()).executeUpdate();
+                Date end = new Date();
+                executeTime = end.getTime() - start.getTime();
+            } catch (Exception e) {
+                entityManager.getTransaction().rollback();
+                return ResponseCheckSql
+                        .builder()
+                        .taskUserId(requestCheckSql.getTaskUserId())
+                        .status(Status.ERROR)
+                        .message(e.getMessage())
+                        .build();
+            }
+
+            try {
+                userResult = processSelectSql(entityManager, requestCheckSql.getCheckSql()).getFirst();
+            } catch (Exception ignored) {
+
+            }
+
             entityManager.getTransaction().rollback();
-            return ResponseCheckSql
-                    .builder()
-                    .taskUserId(requestCheckSql.getTaskUserId())
-                    .status(Status.ERROR)
-                    .message(e.getMessage())
-                    .build();
-        }
 
-        try {
-            userResult = processSelectSql(entityManager, requestCheckSql.getCheckSql()).getFirst();
-        } catch (Exception ignored) {
+            entityManager.getTransaction().begin();
 
-        }
+            List<Map<String, Object>> mainResult = null;
 
-        entityManager.getTransaction().rollback();
+            try {
+                entityManager.createNativeQuery(requestCheckSql.getMainSql()).executeUpdate();
+            } catch (Exception e) {
+                entityManager.getTransaction().rollback();
+            }
 
-        entityManager.getTransaction().begin();
+            try {
+                mainResult = processSelectSql(entityManager, requestCheckSql.getCheckSql()).getFirst();
+            } catch (Exception ignored) {
 
-        List<Map<String, Object>> mainResult = null;
+            }
 
-        try {
-            entityManager.createNativeQuery(requestCheckSql.getMainSql()).executeUpdate();
-        } catch (Exception e) {
             entityManager.getTransaction().rollback();
+
+            return checkAndSet(requestCheckSql.getTaskUserId(), userResult, mainResult, executeTime);
+        } finally {
+            entityManager.close();
         }
-
-        try {
-            mainResult = processSelectSql(entityManager, requestCheckSql.getCheckSql()).getFirst();
-        } catch (Exception ignored) {
-
-        }
-
-        entityManager.getTransaction().rollback();
-
-        return checkAndSet(requestCheckSql.getTaskUserId(), userResult, mainResult, executeTime);
     }
 
     @Override
@@ -137,76 +145,83 @@ public class QueryExecuteServiceImpl implements QueryExecuteService {
     public ResponseCreateSchema createSchema(RequestCreateSchema requestCreateSchema) {
         String schemaName = "course" + requestCreateSchema.getCourseId();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        entityManager.getTransaction().begin();
-        String sql = "CREATE SCHEMA " + schemaName;
         try {
-            entityManager.createNativeQuery(sql).executeUpdate();
-        } catch (Exception ignored) {
-            entityManager.getTransaction().rollback();
+            entityManager.getTransaction().begin();
+            String sql = "CREATE SCHEMA " + schemaName;
+            try {
+                entityManager.createNativeQuery(sql).executeUpdate();
+            } catch (Exception ignored) {
+                entityManager.getTransaction().rollback();
+            }
+            entityManager.getTransaction().commit();
+            return ResponseCreateSchema
+                    .builder()
+                    .courseId(requestCreateSchema.getCourseId())
+                    .schema(schemaName)
+                    .build();
+        } finally {
+            entityManager.close();
         }
-        entityManager.getTransaction().commit();
-        return ResponseCreateSchema
-                .builder()
-                .courseId(requestCreateSchema.getCourseId())
-                .schema(schemaName)
-                .build();
     }
 
     private List<ResponseExecuteSql> executeSql(RequestExecuteSql requestExecuteSql, Boolean admin) {
         log.info("Execute sql user - {}", requestExecuteSql.getUserId());
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        setSchema(entityManager, requestExecuteSql.getSchema());
-
-        entityManager.getTransaction().begin();
-
-        List<ResponseExecuteSql> responseExecuteSqls = new ArrayList<>();
-
-        String[] sqls = requestExecuteSql.getUserSql().split(";");
-
         try {
-            for (String sql : sqls) {
-                String lowerSql = sql.toLowerCase();
-                if (!lowerSql.contains("insert")
-                        && !lowerSql.contains("delete")
-                        && !lowerSql.contains("update")
-                        && !lowerSql.contains("drop")
-                        && !lowerSql.contains("create")
-                        && !lowerSql.contains("alter")) {
-                    Pair<List<Map<String, Object>>, Long> result = processSelectSql(entityManager, sql);
-                    responseExecuteSqls.add(
-                            ResponseExecuteSql.builder()
-                                    .resultSelect(result.getFirst())
-                                    .userId(requestExecuteSql.getUserId())
-                                    .message("OK")
-                                    .time(result.getSecond())
-                                    .build()
-                    );
-                } else {
-                    responseExecuteSqls.add(
-                            ResponseExecuteSql.builder()
-                                    .resultOther(entityManager.createNativeQuery(sql).executeUpdate())
-                                    .userId(requestExecuteSql.getUserId())
-                                    .message("OK")
-                                    .build()
-                    );
+            setSchema(entityManager, requestExecuteSql.getSchema());
+
+            entityManager.getTransaction().begin();
+
+            List<ResponseExecuteSql> responseExecuteSqls = new ArrayList<>();
+
+            String[] sqls = requestExecuteSql.getUserSql().split(";");
+
+            try {
+                for (String sql : sqls) {
+                    String lowerSql = sql.toLowerCase();
+                    if (!lowerSql.contains("insert")
+                            && !lowerSql.contains("delete")
+                            && !lowerSql.contains("update")
+                            && !lowerSql.contains("drop")
+                            && !lowerSql.contains("create")
+                            && !lowerSql.contains("alter")) {
+                        Pair<List<Map<String, Object>>, Long> result = processSelectSql(entityManager, sql);
+                        responseExecuteSqls.add(
+                                ResponseExecuteSql.builder()
+                                        .resultSelect(result.getFirst())
+                                        .userId(requestExecuteSql.getUserId())
+                                        .message("OK")
+                                        .time(result.getSecond())
+                                        .build()
+                        );
+                    } else {
+                        responseExecuteSqls.add(
+                                ResponseExecuteSql.builder()
+                                        .resultOther(entityManager.createNativeQuery(sql).executeUpdate())
+                                        .userId(requestExecuteSql.getUserId())
+                                        .message("OK")
+                                        .build()
+                        );
+                    }
                 }
+            } catch (Exception e) {
+                responseExecuteSqls.add(
+                        ResponseExecuteSql.builder()
+                                .userId(requestExecuteSql.getUserId())
+                                .message(e.getMessage())
+                                .build()
+                );
             }
-        } catch (Exception e) {
-            responseExecuteSqls.add(
-                    ResponseExecuteSql.builder()
-                            .userId(requestExecuteSql.getUserId())
-                            .message(e.getMessage())
-                            .build()
-            );
-        }
 
-        if (admin) {
-            entityManager.getTransaction().commit();
-        } else {
-            entityManager.getTransaction().rollback();
+            if (admin) {
+                entityManager.getTransaction().commit();
+            } else {
+                entityManager.getTransaction().rollback();
+            }
+            return responseExecuteSqls;
+        } finally {
+            entityManager.close();
         }
-
-        return responseExecuteSqls;
     }
 
     private Pair<List<Map<String, Object>>, Long> processSelectSql(EntityManager entityManager, String sql) {

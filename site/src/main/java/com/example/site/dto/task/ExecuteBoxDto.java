@@ -9,9 +9,6 @@ import java.util.List;
 @Schema(description = "Выполнение выбора")
 public class ExecuteBoxDto {
 
-    @Schema(description = "Задача")
-    private Long taskId;
-
     @Schema(description = "Выбранные ответы")
     private List<Long> resultIds;
 }

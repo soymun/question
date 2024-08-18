@@ -69,7 +69,7 @@ public class Worker {
             taskHistoryResult.setRights(true);
             taskHistoryResult.setMessage(responseCheckCode.getMessage());
 
-            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(taskHistoryResult.getTask().getId(), taskHistoryResult.getUser().getId()).orElseThrow();
+            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(taskHistoryResult.getUser().getId(), taskHistoryResult.getTask().getId()).orElseThrow();
 
             userTask.setRights(true);
 

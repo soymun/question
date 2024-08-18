@@ -10,9 +10,6 @@ public class TaskInfoSqlAdminDto {
     @Schema(description = "ID")
     private Long id;
 
-    @Schema(description = "Задача")
-    private Long task;
-
     @Schema(description = "Проверочный sql")
     private String checkSql;
 

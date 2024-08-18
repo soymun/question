@@ -37,6 +37,6 @@ public interface CourseRepository extends JpaRepository<Courses, Long> {
     @Query(value = "select t.courses from Task t where t.id=:id")
     Optional<Courses> getCoursesByTaskId(@Param("id") Long taskId);
 
-    @Query("select (c.timeExecute > current timestamp) from Task t left join Courses  c on t.courses.id = c.id where t.id=:id")
+    @Query("select (c.timeExecute > current_timestamp) from Task t left join Courses  c on t.courses.id = c.id where t.id=:id")
     Boolean getPredicateCourse(@Param("id") Long taskId);
 }

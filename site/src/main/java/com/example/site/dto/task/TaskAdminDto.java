@@ -5,9 +5,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Schema(description = "Создание задачи")
-public class TaskCreateDto {
+public class TaskAdminDto {
+
+    @Schema(description = "ID")
+    private Long id;
 
     @NotNull
     @Schema(description = "Номер задачи")
@@ -32,4 +37,12 @@ public class TaskCreateDto {
 
     @Schema(description = "Открытость")
     private Boolean open;
+
+    private List<TaskInfoCodeAdminDto> taskInfoCode;
+
+    private List<TaskInfoQuestionBoxAdminDto> taskInfoQuestionBox;
+
+    private TaskInfoQuestionTextAdminDto taskInfoQuestionText;
+
+    private TaskInfoSqlAdminDto taskInfoSql;
 }

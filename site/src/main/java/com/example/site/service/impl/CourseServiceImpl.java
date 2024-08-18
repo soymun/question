@@ -15,10 +15,12 @@ import com.example.site.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -115,13 +117,18 @@ public class CourseServiceImpl implements CourseService {
         Courses courses = courseRepository.findById(requestExecuteSql.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
         if (courses.getSchema() != null) {
             boolean adminSql = admin || courses.getUserCreated().getId().equals(userId);
-            return (List<ResponseExecuteSql>) rabbitTemplate.convertSendAndReceive("execute", RequestExecuteSql
+            return rabbitTemplate.convertSendAndReceiveAsType("execute", RequestExecuteSql
                     .builder()
                     .admin(adminSql)
                     .userId(userId)
                     .schema(courses.getSchema())
                     .userSql(requestExecuteSql.getUserSql())
-                    .build());
+                    .build(), new ParameterizedTypeReference<List<ResponseExecuteSql>>() {
+                @Override
+                public Type getType() {
+                    return List.class;
+                }
+            });
         } else {
             throw new ForbiddenException("Создайте задачу по sql");
         }

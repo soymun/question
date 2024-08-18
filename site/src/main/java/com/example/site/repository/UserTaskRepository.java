@@ -1,5 +1,6 @@
 package com.example.site.repository;
 
+import com.example.site.model.Task;
 import com.example.site.model.UserTask;
 import com.example.site.model.UserTaskId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,9 @@ public interface UserTaskRepository extends JpaRepository<UserTask, UserTaskId> 
 
     @Query(value = "from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.courses.id=:cId and  ut.closed = FALSE and ut.userTaskId.task.open and ut.userTaskId.task.deleted = false ORDER BY ut.userTaskId.task.number")
     List<UserTask> getUserTaskByUserIdAndCourseId(@Param("uId") Long userId, @Param("cId") Long courseId);
+
+    @Query(value = "select ut.userTaskId.task from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.id=:cId and  ut.closed = FALSE and ut.userTaskId.task.open and ut.userTaskId.task.deleted = false ORDER BY ut.userTaskId.task.number")
+    Optional<Task> getUserTaskByUserIdAndTaskId(@Param("uId") Long userId, @Param("cId") Long taskId);
 
     @Query(value = "from UserTask ut where ut.userTaskId.user.groups.id=:gId and ut.userTaskId.task.courses.id=:cId")
     List<UserTask> getUserTaskByGroupIdAndCourseId(@Param("gId") Long groupId, @Param("cId") Long courseId);

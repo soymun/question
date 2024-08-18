@@ -10,9 +10,6 @@ public class TaskInfoQuestionBoxAdminDto {
     @Schema(description = "ID")
     private Long id;
 
-    @Schema(description = "Задача")
-    private Long task;
-
     @Schema(description = "Ответ")
     private String answer;
 

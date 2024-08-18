@@ -11,9 +11,6 @@ public class TaskInfoCodeDto {
     @Schema(description = "ID")
     private Long id;
 
-    @Schema(description = "Задача")
-    private Long task;
-
     @Schema(description = "Тип")
     private DcCodeTypeDto codeType;
 

@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "dc_code_type", schema = "cources")
+@Table(name = "dc_code_type", schema = "courses")
 public class DcCodeType {
 
     @Id

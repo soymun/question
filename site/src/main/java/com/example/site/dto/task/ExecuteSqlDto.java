@@ -7,9 +7,6 @@ import lombok.Data;
 @Schema(description = "Выполнение sql")
 public class ExecuteSqlDto {
 
-    @Schema(description = "Задача")
-    private Long taskId;
-
     @Schema(description = "Код пользователя")
     private String userSql;
 }

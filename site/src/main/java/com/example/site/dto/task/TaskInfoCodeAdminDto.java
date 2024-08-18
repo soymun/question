@@ -7,11 +7,10 @@ import lombok.Data;
 
 @Data
 @Schema(description = "Информация о коде")
-public class TaskInfoCodeCreateDto {
+public class TaskInfoCodeAdminDto {
 
-    @NotNull
-    @Schema(description = "Задача")
-    private Long task;
+    @Schema(description = "ID")
+    private Long id;
 
     @NotNull
     @Schema(description = "Тип кода")

@@ -1,10 +1,9 @@
-package com.example.site.rest;
+package com.example.site.controllers;
 
 import com.example.site.dto.ResultDto;
 import com.example.site.dto.user.PasswordUpdateDto;
 import com.example.site.dto.user.UserDto;
 import com.example.site.dto.user.UserUpdateDto;
-import com.example.site.security.UserDetailImpl;
 import com.example.site.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

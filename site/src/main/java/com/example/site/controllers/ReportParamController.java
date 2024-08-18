@@ -1,7 +1,6 @@
-package com.example.site.rest;
+package com.example.site.controllers;
 
 import com.example.site.dto.ResultDto;
-import com.example.site.dto.dcreportparamtype.DcReportParamTypeCreateDto;
 import com.example.site.dto.dcreportparamtype.DcReportParamTypeDto;
 import com.example.site.dto.reportparam.ReportParamCreateDto;
 import com.example.site.dto.reportparam.ReportParamDto;

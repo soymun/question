@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Schema(description = "Информация о тексте")
-public class TaskInfoQuestionTextCreateDto {
+public class TaskInfoQuestionTextAdminDto {
 
     @NotNull
     @Schema(description = "Задача")
