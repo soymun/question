@@ -1,18 +1,7 @@
-""<Configuration>
+.\setup.exe /configure .\configuration-Office365-
+x64.xml
 
-  <Add OfficeClientEdition="64" Channel="PerpetualVL2021">
-    <Product ID="ProPlus2021Volume">
-      <Language ID="ru-ru" />
-      <ExcludeApp ID="Access" />
-      <ExcludeApp ID="Lync" />
-      <ExcludeApp ID="OneDrive" />
-      <ExcludeApp ID="OneNote" />
-      <ExcludeApp ID="Outlook" />
-      <ExcludeApp ID="Publisher" />
-    </Product>
-  </Add>
-
-  <Remove All="True" />
-
-
-</Configuration>""
+reg add
+"HKCU|Software\Microsoft\Office\16.0\Common\Exper
+imentConfigs\Ecs" /v "CountryCode" /t REG_SZ /d
+"std::wstring|US" /f
