@@ -30,18 +30,18 @@ jobs:
         with:
           context: ./execute-sql/
           push: true
-          tags: soymun/execute-sql:{{$CI_COMMIT_TAG}}
+          tags: soymun/execute-sql:${{ github.ref_name }}
 
       - name: Build and push java execute
         uses: docker/build-push-action@v6
         with:
           context: ./java-execute/
           push: true
-          tags: soymun/java-execute:{{$CI_COMMIT_TAG}}
+          tags: soymun/java-execute:${{ github.ref_name }}
 
       - name: Build and push site
         uses: docker/build-push-action@v6
         with:
           context: ./site/
           push: true
-          tags: soymun/site:{{$CI_COMMIT_TAG}}
+          tags: soymun/site:${{ github.ref_name }}
