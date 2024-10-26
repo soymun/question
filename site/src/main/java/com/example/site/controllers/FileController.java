@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,8 +40,14 @@ public class FileController {
     }
 
     @Operation(description = "Получить файл")
-    @GetMapping("/file/{name}")
+    @GetMapping(value = "/file/{name}")
     public ResponseEntity<Resource> getFile(@PathVariable String name) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return ResponseEntity.ok(fileService.downloadFile(name, BucketUtil.Buckets.FILES.value));
+    }
+
+    @Operation(description = "Получить файл")
+    @GetMapping(value = "/file/jpg/{name}", produces = "image/png")
+    public ResponseEntity<Resource> getFileJpg(@PathVariable String name) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return ResponseEntity.ok(fileService.downloadFile(name, BucketUtil.Buckets.FILES.value));
     }
 

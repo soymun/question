@@ -52,7 +52,13 @@ public class TaskServiceImpl {
 
             log.info("Save task at course {}", taskAdminDto.getCourses());
 
-            Task task = taskMapper.createToEntity(taskAdminDto);
+            Task task;
+
+            if (taskAdminDto.getId() == null){
+                task = taskMapper.createToEntity(taskAdminDto);
+            } else {
+                task = taskMapper.updateToEntity(taskAdminDto);
+            }
             Task savedTask = taskRepository.save(task);
 
             if (taskAdminDto.getId() == null) {
@@ -72,7 +78,7 @@ public class TaskServiceImpl {
                 }
             }
 
-            userTaskRepository.saveAll(userCourseRepository.getUserCourseByCourseId(taskAdminDto.getCourses()).stream().map(uc -> new UserTask(new UserTaskId(uc.getUserCourseId().getUser().getId(), savedTask.getId()), false, false, 1L)).toList());
+            userTaskRepository.saveAll(userCourseRepository.getUserCourseByCourseId(taskAdminDto.getCourses()).stream().map(uc -> new UserTask(new UserTaskId(uc.getUserCourseId().getUser().getId(), savedTask.getId()), false, false, 0L)).toList());
 
             return taskMapper.taskToTaskDto(savedTask);
         } else {
@@ -88,7 +94,7 @@ public class TaskServiceImpl {
         task.setDeleted(true);
         taskRepository.save(task);
         userTaskRepository.deleteUserTaskByTaskId(id);
-        userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(task.getCourses().getId()).stream().peek(uc -> uc.setCourseMarks(courseMarksRepository.getCourseMarksLessCountByCourseId(task.getCourses().getId()))).toList());
+//        userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(task.getCourses().getId()).stream().peek(uc -> uc.setCourseMarks(courseMarksRepository.getCourseMarksLessCountByCourseId(task.getCourses().getId()))).toList());
     }
 
 
@@ -117,7 +123,7 @@ public class TaskServiceImpl {
     }
 
 
-    public List<UserTaskDto> getTaskToUserByCourse(Long userId, Long courseId) {
-        return userTaskRepository.getUserTaskByUserIdAndCourseId(userId, courseId).stream().map(taskMapper::userTaskToUserTaskDto).collect(Collectors.toList());
+    public List<UserTaskDto> getTaskToUserByCourse(Long userId, Long courseId, Boolean admin) {
+        return userTaskRepository.getUserTaskByUserIdAndCourseIdToGet(userId, courseId, admin).stream().map(taskMapper::userTaskToUserTaskDto).collect(Collectors.toList());
     }
 }

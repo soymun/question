@@ -4,6 +4,8 @@ import com.example.site.dto.user.UserInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Schema(description = "История")
 public class HistoryDto {
@@ -22,6 +24,9 @@ public class HistoryDto {
 
     @Schema(description = "Верность")
     private Boolean rights;
+
+    @Schema(description = "Время попытки")
+    private LocalDateTime timeResult;
 
     @Schema(description = "Код")
     private String code;

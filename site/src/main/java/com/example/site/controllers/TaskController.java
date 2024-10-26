@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,8 +51,8 @@ public class TaskController {
 
     @GetMapping("/user/course/{id}")
     @Operation(description = "Получить для пользователя")
-    public ResponseEntity<ResultDto<List<UserTaskDto>>> getAllByQuery(@PathVariable Long id, @AuthenticationPrincipal UserDetailImpl principal) {
-        return ResponseEntity.ok(new ResultDto<>(taskService.getTaskToUserByCourse(principal.getId(), id)));
+    public ResponseEntity<ResultDto<List<UserTaskDto>>> getAllByQuery(@PathVariable Long id, @AuthenticationPrincipal UserDetailImpl principal, @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
+        return ResponseEntity.ok(new ResultDto<>(taskService.getTaskToUserByCourse(principal.getId(), id, grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN")))));
     }
 
     @GetMapping("/user/get/{id}")

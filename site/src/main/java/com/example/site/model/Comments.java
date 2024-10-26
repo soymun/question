@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -34,6 +35,7 @@ public class Comments {
     private String message;
 
     @Column(name = "create_time")
+    @CreationTimestamp
     private LocalDateTime createTime;
 
     private Boolean apply;

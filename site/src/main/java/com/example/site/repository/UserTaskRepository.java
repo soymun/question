@@ -16,6 +16,12 @@ public interface UserTaskRepository extends JpaRepository<UserTask, UserTaskId> 
     @Query(value = "from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.courses.id=:cId and  ut.closed = FALSE and ut.userTaskId.task.open and ut.userTaskId.task.deleted = false ORDER BY ut.userTaskId.task.number")
     List<UserTask> getUserTaskByUserIdAndCourseId(@Param("uId") Long userId, @Param("cId") Long courseId);
 
+    @Query(value = "from UserTask ut " +
+            "where ut.userTaskId.user.id=:uId and ut.userTaskId.task.courses.id=:cId " +
+            "and ((ut.closed = FALSE and ut.userTaskId.task.open and ut.userTaskId.task.deleted = false) or ut.userTaskId.task.courses.userCreated.id = :uId or :admin = TRUE)" +
+            "ORDER BY ut.userTaskId.task.number")
+    List<UserTask> getUserTaskByUserIdAndCourseIdToGet(@Param("uId") Long userId, @Param("cId") Long courseId, @Param("admin") Boolean admin);
+
     @Query(value = "select ut.userTaskId.task from UserTask ut where ut.userTaskId.user.id=:uId and ut.userTaskId.task.id=:cId and  ut.closed = FALSE and ut.userTaskId.task.open and ut.userTaskId.task.deleted = false ORDER BY ut.userTaskId.task.number")
     Optional<Task> getUserTaskByUserIdAndTaskId(@Param("uId") Long userId, @Param("cId") Long taskId);
 

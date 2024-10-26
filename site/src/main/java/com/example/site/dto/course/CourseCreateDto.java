@@ -25,7 +25,6 @@ public class CourseCreateDto {
     @Schema(description = "Тип курса")
     private CourseType courseType;
 
-    @NotNull
     @Schema(description = "Создатель курса")
     private Long userCreated;
 

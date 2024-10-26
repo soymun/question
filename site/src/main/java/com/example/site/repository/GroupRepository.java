@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Groups, Long> {
 
-    @Query(value = "from Groups g where g.fullName like concat(:names, '%') or g.shortName like concat(:names, '%')")
+    @Query(value = "from Groups g where g.fullName ilike concat(:names, '%') or g.shortName ilike concat(:names, '%')")
     List<Groups> getAllByNames(@Param("names") String name);
 
     @Query(value = "SELECT DISTINCT uc.userCourseId.user.groups FROM UserCourse uc where uc.userCourseId.courses.id = :cId and uc.deleted = FALSE ")

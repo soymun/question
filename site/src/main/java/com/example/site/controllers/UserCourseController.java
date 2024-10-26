@@ -26,11 +26,28 @@ public class UserCourseController {
 
     private final UserCourseServiceImpl userCourseService;
 
-
     @GetMapping("/course/{id}")
-    @Operation(description = "Получение курса для пользователя")
+    @Operation(description = "Получение курса по пользователя")
     public ResponseEntity<ResultDto<UserCourseDto>> getUserCourseByUserIdAndCourseId(@PathVariable Long id, @AuthenticationPrincipal(expression = "id") Long idUser) {
         return ResponseEntity.ok(new ResultDto<>(userCourseService.getUserCourseByUserIdAndCourseId(id, idUser)));
+    }
+
+    @GetMapping("/user")
+    @Operation(description = "Получение курса для пользователя")
+    public ResponseEntity<ResultDto<List<UserCourseDto>>> getCoursesByUser(@AuthenticationPrincipal(expression = "id") Long idUser) {
+        return ResponseEntity.ok(new ResultDto<>(userCourseService.getCoursesToUser(idUser)));
+    }
+
+    @PostMapping("/course/add/{id}")
+    @Operation(description = "Добавить пользователя в курс")
+    public ResponseEntity<ResultDto<UserCourseDto>> addUserCourseByUserIdAndCourseId(@PathVariable Long id, @AuthenticationPrincipal(expression = "id") Long idUser, @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
+        return ResponseEntity.ok(new ResultDto<>(userCourseService.addUserCourseByUserIdAndCourseId(id, idUser, grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN")))));
+    }
+
+    @PostMapping("/course/{uId}/add/{id}")
+    @Operation(description = "Добавить пользователя в курс")
+    public ResponseEntity<ResultDto<UserCourseDto>> addUser(@PathVariable Long id, @PathVariable Long uId, @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
+        return ResponseEntity.ok(new ResultDto<>(userCourseService.addUserCourseByUserIdAndCourseId(id, uId, grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN")))));
     }
 
     @GetMapping("/course/{id}/group/{gId}")
@@ -55,12 +72,12 @@ public class UserCourseController {
         userCourseService.saveUserCourseGroup(id, cId, idUser, grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN")));
         return ResponseEntity.status(201).build();
     }
-    
+
     @DeleteMapping("/user/{id}/course/{cid}")
     @Operation(description = "Удаление пользователя из курса")
     @PreAuthorize(value = "hasAuthority('TEACHER')")
     public ResponseEntity<ResultDto<CourseDto>> deleteCourse(@PathVariable Long cid, @PathVariable Long id, @AuthenticationPrincipal UserDetailImpl principal) {
-        userCourseService.deleteCourse(id,cid, principal.getId(), principal.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN")));
+        userCourseService.deleteCourse(id, cid, principal.getId(), principal.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN")));
         return ResponseEntity.status(204).build();
     }
 
@@ -68,7 +85,7 @@ public class UserCourseController {
     @Operation(description = "Удаление группы пользователей из курса")
     @PreAuthorize(value = "hasAuthority('TEACHER')")
     public ResponseEntity<ResultDto<CourseDto>> deleteCourseByGroup(@PathVariable Long cid, @PathVariable Long id, @AuthenticationPrincipal UserDetailImpl principal) {
-        userCourseService.deleteUserCoursesByGroupId(id,cid, principal.getId(), principal.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN")));
+        userCourseService.deleteUserCoursesByGroupId(id, cid, principal.getId(), principal.getAuthorities().stream().anyMatch(p -> p.getAuthority().equals("ADMIN")));
         return ResponseEntity.status(204).build();
     }
 }

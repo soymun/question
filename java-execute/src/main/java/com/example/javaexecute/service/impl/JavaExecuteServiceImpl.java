@@ -1,10 +1,11 @@
 package com.example.javaexecute.service.impl;
 
-import com.example.javaexecute.dto.*;
+import com.example.javaexecute.dto.CodeExecuteRequest;
+import com.example.javaexecute.dto.CodeExecuteResponse;
+import com.example.javaexecute.dto.Status;
 import com.example.javaexecute.service.JavaExecuteService;
 import lombok.RequiredArgsConstructor;
 import org.mdkt.compiler.InMemoryJavaCompiler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -13,11 +14,9 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JavaExecuteServiceImpl implements JavaExecuteService {
 
-    @Autowired
-    private InMemoryJavaCompiler inMemoryJavaCompiler;
-
     @Override
     public CodeExecuteResponse execute(CodeExecuteRequest executeRequest) {
+        InMemoryJavaCompiler inMemoryJavaCompiler = InMemoryJavaCompiler.newInstance();
         String p = "t" + executeRequest.getTaskId() + ".u" + executeRequest.getUserId() + ".a" + executeRequest.getAttempt();
 
         String pakcage = "package " + p + ";\n";

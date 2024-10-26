@@ -33,6 +33,21 @@ public abstract class TaskMapper {
         }
 
         taskCreateDtoToTask(taskAdminDto, task);
+        return task;
+    }
+
+    public Task updateToEntity(TaskAdminDto taskAdminDto) {
+        Task task;
+        if (taskAdminDto.getId() == null) {
+            task = new Task();
+        } else {
+            task = entityManager.getReference(Task.class, taskAdminDto.getId());
+            if (task == null) {
+                throw new NotFoundException("Task not found");
+            }
+        }
+
+        taskCreateDtoToTask(taskAdminDto, task);
 
         switch (task.getTaskType()) {
             case SQL -> {

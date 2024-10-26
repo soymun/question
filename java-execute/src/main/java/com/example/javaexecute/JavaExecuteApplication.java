@@ -14,9 +14,4 @@ public class JavaExecuteApplication {
         SpringApplication.run(JavaExecuteApplication.class, args);
     }
 
-    @Bean
-    public InMemoryJavaCompiler inMemoryJavaCompiler(){
-        return InMemoryJavaCompiler.newInstance();
-    }
-
 }

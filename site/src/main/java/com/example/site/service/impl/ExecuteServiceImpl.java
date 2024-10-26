@@ -201,7 +201,7 @@ public class ExecuteServiceImpl {
             taskHistoryResult.setTask(userTask.getUserTaskId().getTask());
             taskHistoryResult.setCode(executeCodeDto.getUserCode());
             taskHistoryResult.setMessage("");
-            taskHistoryResult.setRights(false);
+            taskHistoryResult.setRights(null);
             taskHistoryResult.setUser(userTask.getUserTaskId().getUser());
             taskHistoryResult.setTimeResult(LocalDateTime.now());
 
@@ -238,7 +238,7 @@ public class ExecuteServiceImpl {
 
         CourseMarks courseMarks = courseMarksRepository.getCourseMarksByCourseIdAndCountTask(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId());
         if (courseMarks != null) {
-            UserCourse userCourse = userCourseRepository.getUserCourseByUserIdAndCourse(userTask.getUserTaskId().getTask().getCourses().getId(), userTask.getUserTaskId().getUser().getId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
+            UserCourse userCourse = userCourseRepository.getUserCourseByUserIdAndCourse(userTask.getUserTaskId().getUser().getId(), userTask.getUserTaskId().getTask().getCourses().getId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
 
             userCourse.setCourseMarks(courseMarks);
 

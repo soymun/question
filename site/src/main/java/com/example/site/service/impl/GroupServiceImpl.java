@@ -38,7 +38,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupDto> getByName(String name) {
-        return groupRepository.getAllByNames(name).stream().map(groupMapper::groupToGroupDto).toList();
+        return groupRepository.getAllByNames(name.toLowerCase()).stream().map(groupMapper::groupToGroupDto).toList();
     }
 
     @Override

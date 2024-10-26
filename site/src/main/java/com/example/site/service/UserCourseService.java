@@ -17,4 +17,8 @@ public interface UserCourseService {
     UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId, Long userId);
 
     void saveUserCourseGroup(Long groupId, Long courseId, Long thisUser, boolean admin);
+
+    UserCourseDto addUserCourseByUserIdAndCourseId(Long courseId, Long userId, boolean admin);
+
+    List<UserCourseDto> getCoursesToUser(Long userId);
 }

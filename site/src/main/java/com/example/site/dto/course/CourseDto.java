@@ -32,11 +32,17 @@ public class CourseDto {
     private UserInclude userCreated;
 
     @Schema(description = "Дата создания")
-    private LocalDateTime create;
+    private LocalDateTime createTime;
 
     @Schema(description = "Дата обновления")
-    private LocalDateTime update;
+    private LocalDateTime updateTime;
 
     @Schema(description = "Дата закрытия")
     private LocalDateTime timeExecute;
+
+    @Schema(description = "Схема SQL")
+    private String schema;
+
+    @Schema(description = "Открытый")
+    private Boolean open;
 }

@@ -4,8 +4,8 @@ import com.example.site.dto.user.*;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.UserMapper;
 import com.example.site.model.Groups;
-import com.example.site.model.util.Role;
 import com.example.site.model.User;
+import com.example.site.model.util.Role;
 import com.example.site.repository.UserRepository;
 import com.example.site.security.UserDetailImpl;
 import com.example.site.service.UserService;
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
             log.info("Authorization user {}", findUser.getId());
 
-            return new UserDetailImpl(findUser.getId(), findUser.getEmail(), findUser.getPassword(),findUser.getRole(), findUser.getRole().getAuthority(), findUser.getActive());
+            return new UserDetailImpl(findUser.getId(), findUser.getEmail(), findUser.getPassword(), findUser.getRole(), findUser.getRole().getAuthority(), findUser.getActive());
         } else {
             throw new NotFoundException("Пользователь не найден");
         }
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable("emails")
     public Pair<Long, Role> getUserRole(String email) {
         Optional<User> findUser = userRepository.findUserByEmail(email);
-        if(findUser.isPresent()){
+        if (findUser.isPresent()) {
             return Pair.of(findUser.get().getId(), findUser.get().getRole());
         }
         throw new NotFoundException("Пользователь не найден");
@@ -154,8 +154,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAll(int pageNumber, int pageSize) {
-        return userRepository.findAll(PageRequest.of(pageNumber, pageSize)).get().map(userMapper::userToUserDto).toList();
+    public List<UserDto> getAll(String name) {
+        return userRepository.findUserByName("%" + name + "%").stream().map(userMapper::userToUserDto).toList();
     }
 
     @Override

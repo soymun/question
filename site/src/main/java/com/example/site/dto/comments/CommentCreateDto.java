@@ -12,7 +12,6 @@ public class CommentCreateDto {
     @Schema(description = "Задача")
     private Long task;
 
-    @NotNull
     @Schema(description = "Пользователь")
     private Long user;
 

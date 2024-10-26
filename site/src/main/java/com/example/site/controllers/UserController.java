@@ -62,8 +62,8 @@ public class UserController {
 
     @GetMapping
     @Operation(description = "Получение всех пользователей")
-    private ResponseEntity<ResultDto<List<UserDto>>> getAll(@RequestParam int pageNumber, @RequestParam int pageSize) {
-        return ResponseEntity.ok(new ResultDto<>(userService.getAll(pageNumber, pageSize)));
+    private ResponseEntity<ResultDto<List<UserDto>>> getAll(@RequestParam String name) {
+        return ResponseEntity.ok(new ResultDto<>(userService.getAll(name)));
 
     }
 

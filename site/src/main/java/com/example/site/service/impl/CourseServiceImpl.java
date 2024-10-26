@@ -1,27 +1,26 @@
 package com.example.site.service.impl;
 
-import com.example.site.dto.*;
-import com.example.site.dto.course.CourseCreateDto;
-import com.example.site.dto.course.CourseDto;
-import com.example.site.dto.course.CourseUpdateDto;
-import com.example.site.dto.course.ExecuteSqlDto;
+import com.example.site.dto.RequestExecuteSql;
+import com.example.site.dto.ResponseExecuteSql;
+import com.example.site.dto.course.*;
 import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.CourseMapper;
 import com.example.site.model.Courses;
 import com.example.site.model.util.CourseType;
 import com.example.site.repository.CourseRepository;
+import com.example.site.repository.UserCourseRepository;
 import com.example.site.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
@@ -37,14 +36,13 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseMapper courseMapper;
 
-    @Override
-    public List<CourseDto> getAll(int pageNumber, int pageSize, Long userId, boolean admin) {
-        return courseRepository.getAll(userId, admin, PageRequest.of(pageNumber, pageSize)).get().map(courseMapper::courseToCourseDto).toList();
-    }
+    private final UserCourseRepository userCourseRepository;
 
     @Override
-    public List<CourseDto> getByQuery(String name, int pageNumber, int pageSize, Long userId, boolean admin) {
-        return courseRepository.getCoursesByQuery(name, userId, admin, PageRequest.of(pageNumber, pageSize)).get().map(courseMapper::courseToCourseDto).toList();
+    public List<CourseDto> getAll(CourseRequestDto courseRequestDto, Long userId, boolean admin) {
+        return courseRepository.getAll(userId, courseRequestDto.getQuery(), userId, admin, courseRequestDto.getTeacher()).stream()
+                .map(courseMapper::courseToCourseDto)
+                .toList();
     }
 
     @Override
@@ -100,13 +98,10 @@ public class CourseServiceImpl implements CourseService {
         if (admin || courses.getUserCreated().getId().equals(userId)) {
             courses.setDeleted(true);
             courseRepository.save(courses);
+            userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(courses.getId()).stream().peek(item -> item.setClosed(true)).collect(Collectors.toList()));
+            return;
         }
         throw new ForbiddenException("Удаление не доступно");
-    }
-
-    @Override
-    public List<CourseDto> getAllByTeacher(Long id, int pageNumber, int pageSize) {
-        return courseRepository.getAllByTeacherId(id, PageRequest.of(pageNumber, pageSize)).get().map(courseMapper::courseToCourseDto).toList();
     }
 
     @Override

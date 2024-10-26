@@ -9,7 +9,11 @@ import java.util.List;
 
 public interface CourseMarksRepository extends JpaRepository<CourseMarks, Long> {
 
-    @Query(value = "from CourseMarks cm where cm.courses.id = :cId and cm.countTask <= (select count(ut.userTaskId.task.id) FROM UserTask ut where ut.userTaskId.task.courses.id = :cId)")
+    @Query(value = """
+            from CourseMarks cm
+            where cm.courses.id = :cId and cm.countTask < (select count(ut.userTaskId.task.id) FROM UserTask ut where ut.userTaskId.task.courses.id = :cId)
+            order by cm.countTask
+            limit 1""")
     CourseMarks getCourseMarksLessCountByCourseId(@Param("cId") Long courseId);
 
     @Query(value = "from CourseMarks cm where cm.courses.id = :cId")

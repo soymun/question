@@ -20,4 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "from User u where u.groups.id = :id")
     List<User> findUserByGroupId(@Param("id") Long id);
+
+
+    @Query(value = "from User u where u.secondName ilike :name or u.firstName  ilike :name or  u.patronymic ilike :name")
+    List<User> findUserByName(@Param("name") String name);
 }

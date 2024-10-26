@@ -1,6 +1,7 @@
 package com.example.site.service.impl;
 
 import com.example.site.dto.usercourse.UserCourseDto;
+import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.UserCourseMapper;
 import com.example.site.model.*;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -97,5 +99,26 @@ public class UserCourseServiceImpl implements UserCourseService {
     @Override
     public UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId, Long userId) {
         return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.findById(new UserCourseId(userId, courseId)).orElseThrow(() -> new  NotFoundException("Курс не найден")));
+    }
+
+    @Override
+    public List<UserCourseDto> getCoursesToUser(Long userId) {
+        return userCourseRepository.getByUserId(userId).stream().map(userCourseMapper::userCourseToUserCourseDto).toList();
+    }
+
+    @Override
+    public UserCourseDto addUserCourseByUserIdAndCourseId(Long courseId, Long userId, boolean admin) {
+
+        Optional<Courses> optionalCourses = courseRepository.findByIdAndUserAndAdminAndUser(courseId, userId, admin);
+
+        if (optionalCourses.isPresent()) {
+            Courses courses = optionalCourses.get();
+
+            userTaskRepository.saveAll(taskRepository.findAllByCourseId(courses.getId()).stream().map(task -> new UserTask(new UserTaskId(userId, task.getId()), false, false, 0L)).toList());
+
+            return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.save(new UserCourse(new UserCourseId(userId, courses.getId()), LocalDateTime.now(), false, false,null)));
+        }
+
+        throw new ForbiddenException("Курс не найден");
     }
 }

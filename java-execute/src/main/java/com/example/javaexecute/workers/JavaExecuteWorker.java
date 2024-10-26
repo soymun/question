@@ -1,6 +1,8 @@
 package com.example.javaexecute.workers;
 
-import com.example.javaexecute.dto.*;
+import com.example.javaexecute.dto.CodeExecuteRequest;
+import com.example.javaexecute.dto.CodeExecuteResponse;
+import com.example.javaexecute.dto.Status;
 import com.example.javaexecute.service.impl.JavaExecuteServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,7 @@ public class JavaExecuteWorker {
     @RabbitListener(queues = "JAVA", group = "executors")
     public void execute(CodeExecuteRequest request) {
         if (request != null) {
-            log.info("Execute sql user {}", request.getUserId());
+            log.info("Execute java code user {}", request.getUserId());
             CodeExecuteResponse codeExecuteResponse;
             if (!request.getCheckCode().contains("System.exit") && !request.getUserCode().contains("System.exit")) {
                 codeExecuteResponse = javaExecuteService.execute(request);
@@ -34,6 +36,7 @@ public class JavaExecuteWorker {
                         .taskId(request.getTaskId())
                         .build();
             }
+            log.info("End execute java code user {}", request.getUserId());
 
             rabbitTemplate.convertAndSend("completed-code", codeExecuteResponse);
         }

@@ -1,5 +1,6 @@
 package com.example.site.dto.usercourse;
 
+import com.example.site.dto.course.CourseDto;
 import com.example.site.dto.user.UserInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -11,7 +12,10 @@ import java.time.LocalDateTime;
 public class UserCourseDto {
 
     @Schema(description = "Пользователь")
-    private UserInclude userCourseId;
+    private UserInclude user;
+
+    @Schema(description = "Курс")
+    private CourseDto course;
 
     @Schema(description = "Оценка")
     private MarkIncludeDto courseMarks;

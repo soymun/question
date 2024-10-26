@@ -25,7 +25,7 @@ public interface UserService extends UserDetailsService {
 
     Pair<Long, Role> authorizationUser(LoginDto loginDto);
 
-    List<UserDto> getAll(int pageNumber, int pageSize);
+    List<UserDto> getAll(String name);
 
     List<UserDto> getAllByGroupId(Long id, int pageNumber, int pageSize);
 }

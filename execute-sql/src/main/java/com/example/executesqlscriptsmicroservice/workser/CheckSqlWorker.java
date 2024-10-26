@@ -24,6 +24,7 @@ public class CheckSqlWorker {
     @RabbitListener(queues = "check", group = "checkers")
     public void checkSql(RequestCheckSql requestCheckSql){
         if(requestCheckSql != null) {
+            log.info("Check sql with task {}", requestCheckSql.getTaskUserId());
             Context context = utilProcess.process(requestCheckSql.getUserSql().toLowerCase(), 2);
             if(context.verified) {
                 if (context.getSelected()) {

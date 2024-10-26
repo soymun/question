@@ -26,7 +26,8 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/v3/api-docs/**",
-            "/swagger-ui/**"
+            "/swagger-ui/**",
+            "/file/file/jpg/**"
     };
 
     @Bean
@@ -54,7 +55,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource cors(){
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedOrigins(List.of("*"));
