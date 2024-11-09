@@ -1,6 +1,7 @@
 package com.example.site.model;
 
 import com.example.site.model.util.CourseType;
+import com.example.site.model.util.TaskType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,6 +57,10 @@ public class Courses {
     @UpdateTimestamp
     @Column(name = "update_time")
     private LocalDateTime updateTime;
+
+    @Column(name = "sql_type")
+    @Enumerated(EnumType.ORDINAL)
+    private TaskType sqlType;
 
     public Courses(Long id) {
         this.id = id;

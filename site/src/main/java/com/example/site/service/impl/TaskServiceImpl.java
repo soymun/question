@@ -6,12 +6,14 @@ import com.example.site.dto.task.TaskAdminDto;
 import com.example.site.dto.task.TaskDto;
 import com.example.site.dto.task.TaskUserDto;
 import com.example.site.dto.task.UserTaskDto;
+import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.TaskMapper;
 import com.example.site.model.Courses;
 import com.example.site.model.Task;
 import com.example.site.model.UserTask;
 import com.example.site.model.UserTaskId;
+import com.example.site.model.util.TaskType;
 import com.example.site.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,11 +56,22 @@ public class TaskServiceImpl {
 
             Task task;
 
-            if (taskAdminDto.getId() == null){
+            if (taskAdminDto.getId() == null) {
                 task = taskMapper.createToEntity(taskAdminDto);
             } else {
                 task = taskMapper.updateToEntity(taskAdminDto);
             }
+
+            if (task.getTaskType() == TaskType.PostgreSQL || task.getTaskType() == TaskType.MySQL) {
+                Optional<Courses> optionalCourses = courseRepository.getCoursesByTaskId(task.getCourses().getId());
+                if (optionalCourses.isPresent()) {
+                    Long countSql = courseRepository.getCourseSqlById(optionalCourses.get().getId(), List.of(task.getTaskType() == TaskType.PostgreSQL ? TaskType.MySQL : TaskType.PostgreSQL));
+                    if (countSql > 0) {
+                        throw new ForbiddenException("Невозможно создать 2 типа sql баз");
+                    }
+                }
+            }
+
             Task savedTask = taskRepository.save(task);
 
             if (taskAdminDto.getId() == null) {
@@ -66,13 +79,14 @@ public class TaskServiceImpl {
                 if (optionalCourses.isPresent()) {
                     Courses courses = optionalCourses.get();
                     if (courses.getSchema() == null || courses.getSchema().isEmpty()) {
-                        courses.setSchema(((ResponseCreateSchema) Objects.requireNonNull(rabbitTemplate.convertSendAndReceiveAsType("schema", RequestCreateSchema.builder().courseId(courses.getId()).build(), new ParameterizedTypeReference<>() {
+                        courses.setSchema(((ResponseCreateSchema) Objects.requireNonNull(rabbitTemplate.convertSendAndReceiveAsType(task.getTaskType().getValue().toLowerCase() + "-schema", RequestCreateSchema.builder().courseId(courses.getId()).build(), new ParameterizedTypeReference<>() {
                             @NotNull
                             @Override
                             public Type getType() {
                                 return ResponseCreateSchema.class;
                             }
                         }))).getSchema());
+                        courses.setSqlType(task.getTaskType());
                         courseRepository.save(courses);
                     }
                 }
@@ -94,7 +108,7 @@ public class TaskServiceImpl {
         task.setDeleted(true);
         taskRepository.save(task);
         userTaskRepository.deleteUserTaskByTaskId(id);
-//        userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(task.getCourses().getId()).stream().peek(uc -> uc.setCourseMarks(courseMarksRepository.getCourseMarksLessCountByCourseId(task.getCourses().getId()))).toList());
+        userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(task.getCourses().getId()).stream().peek(uc -> uc.setCourseMarks(courseMarksRepository.getCourseMarksLessCountByCourseId(task.getCourses().getId()))).toList());
     }
 
 

@@ -23,8 +23,13 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue checkQueue(){
-        return new Queue("check", true);
+    public Queue postgres(){
+        return new Queue("postgresql-check", true);
+    }
+
+    @Bean
+    public Queue mysql(){
+        return new Queue("mysql-check", true);
     }
 
     @Bean
@@ -38,13 +43,23 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue schemaMySqlQueue(){
+        return new Queue("mysql-schema", true);
+    }
+
+    @Bean
+    public Queue executeMySqlQueue(){
+        return new Queue("mysql-execute", true);
+    }
+
+    @Bean
     public Queue schemaQueue(){
-        return new Queue("schema", true);
+        return new Queue("postgresql-schema", true);
     }
 
     @Bean
     public Queue executeQueue(){
-        return new Queue("execute", true);
+        return new Queue("postgresql-execute", true);
     }
 
     @Bean
@@ -73,8 +88,23 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Binding schemaMySqlBinding(){
+        return BindingBuilder.bind(schemaQueue()).to(directExchange()).with("mysql-schema");
+    }
+
+    @Bean
+    public Binding executeMySqlBinding(){
+        return BindingBuilder.bind(executeQueue()).to(directExchange()).with("mysql-execute");
+    }
+
+    @Bean
     public Binding checkBinding(){
-        return BindingBuilder.bind(checkQueue()).to(directExchange()).with("check");
+        return BindingBuilder.bind(postgres()).to(directExchange()).with("postgresql-check");
+    }
+
+    @Bean
+    public Binding mysqlBinding(){
+        return BindingBuilder.bind(mysql()).to(directExchange()).with("mysql-check");
     }
 
     @Bean

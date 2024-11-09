@@ -7,6 +7,7 @@ import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.TaskMapper;
 import com.example.site.model.*;
+import com.example.site.model.util.TaskType;
 import com.example.site.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class ExecuteServiceImpl {
 
             return switch (task.getTaskType()) {
                 case NONE, FILE -> new ResultExecute();
-                case SQL -> executeSql(executeDto.getExecuteSqlDto(), executeDto.getTaskId(), id);
+                case MySQL, PostgreSQL -> executeSql(executeDto.getExecuteSqlDto(), executeDto.getTaskId(), id, task.getTaskType());
                 case QUESTION_BOX_ONE, QUESTION_BOX_MULTI ->
                         executeBox(executeDto.getExecuteBoxDto(), executeDto.getTaskId(), id);
                 case QUESTION_TEXT -> executeText(executeDto.getExecuteTextDto(), executeDto.getTaskId(), id);
@@ -71,7 +72,7 @@ public class ExecuteServiceImpl {
         }
     }
 
-    private ResultExecute executeSql(ExecuteSqlDto executeSqlDto, Long taskId, Long id) {
+    private ResultExecute executeSql(ExecuteSqlDto executeSqlDto, Long taskId, Long id, TaskType taskType) {
 
         Boolean predicate = courseRepository.getPredicateCourse(taskId);
 
@@ -100,7 +101,7 @@ public class ExecuteServiceImpl {
                     .schema(courseRepository.findById(userTask.getUserTaskId().getTask().getCourses().getId()).orElseThrow(() -> new NotFoundException("Курс не найден")).getSchema())
                     .build();
 
-            rabbitTemplate.convertAndSend("check", request);
+            rabbitTemplate.convertAndSend(taskType.getValue().toLowerCase() + "-check", request);
 
             userTask.setAttempt(userTask.getAttempt() + 1);
             userTaskRepository.save(userTask);

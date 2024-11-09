@@ -1,6 +1,7 @@
 package com.example.site.repository;
 
 import com.example.site.model.Courses;
+import com.example.site.model.util.TaskType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,4 +35,7 @@ public interface CourseRepository extends JpaRepository<Courses, Long> {
 
     @Query("select (c.timeExecute > current_timestamp) from Task t left join Courses  c on t.courses.id = c.id where t.id=:id")
     Boolean getPredicateCourse(@Param("id") Long taskId);
+
+    @Query(value = "select count(*) from Task t where t.courses.id = :id and t.taskType in (:types)")
+    Long getCourseSqlById(@Param("id") Long courseId, @Param("types") List<TaskType> types);
 }

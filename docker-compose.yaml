@@ -1,7 +1,7 @@
 version: "1"
 services:
   question:
-    image: soymun/site:latest
+    image: soymun/site:1.0.4
     depends_on:
       - postgres_db
       - rabbitmq
@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   sql:
-    image: soymun/execute-sql:latest
+    image: soymun/execute-sql:1.0.4
     depends_on:
       - postgres_db
       - rabbitmq
@@ -36,8 +36,43 @@ services:
       - "8882:8882"
     restart: unless-stopped
 
+  sql-mysql:
+    image: soymun/execute-sql:1.0.4
+    depends_on:
+      - mysql_db
+      - rabbitmq
+      - question
+    networks:
+      - network
+    expose:
+      - 8883
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_db:3306/stage
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=secret
+      - SPRING_JPA_DATABASE-PLATFORM=org.hibernate.dialect.MySQLDialect
+      - SQL_QUEUE_CHECK=mysql-check
+      - SQL_QUEUE_SCHEMA=mysql-schema
+      - SQL_QUEUE_EXECUTE=mysql-execute
+    ports:
+      - "8882:8882"
+    restart: unless-stopped
+
+  mysql_db:
+    image: mysql:9.1.0
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: stage
+      MYSQL_USER: example
+      MYSQL_PASSWORD: secret2
+    volumes:
+      - ./dbdata:/var/lib/mysql/
+
   java-execute:
-    image: soymun/java-execute:latest
+    image: soymun/java-execute:1.0.4
     depends_on:
       - question
     networks:

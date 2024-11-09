@@ -15,7 +15,7 @@ public class CreateSchemaWorker {
 
     private final QueryExecuteServiceImpl queryExecuteService;
 
-    @RabbitListener(queues = "schema", group = "schemas")
+    @RabbitListener(queues = "${sql.queue.schema}", group = "schemas")
     public ResponseCreateSchema createSchema(RequestCreateSchema requestCreateSchema) {
         if (requestCreateSchema != null) {
             log.info("Create schema {}", requestCreateSchema.getCourseId());

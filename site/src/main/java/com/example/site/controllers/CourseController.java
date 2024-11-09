@@ -28,7 +28,9 @@ public class CourseController {
 
     @PostMapping("/search")
     @Operation(description = "Получение всех курсов")
-    public ResponseEntity<ResultDto<List<CourseDto>>> getAll(@RequestBody CourseRequestDto courseRequestDto, @AuthenticationPrincipal(expression = "id") Long id, @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
+    public ResponseEntity<ResultDto<List<CourseDto>>> getAll(@RequestBody CourseRequestDto courseRequestDto,
+                                                             @AuthenticationPrincipal(expression = "id") Long id,
+                                                             @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
         return ResponseEntity.ok(new ResultDto<>(courseService.getAll(courseRequestDto, id, grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN")))));
     }
 

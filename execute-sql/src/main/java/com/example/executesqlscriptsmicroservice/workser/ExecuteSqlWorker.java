@@ -19,7 +19,7 @@ public class ExecuteSqlWorker {
     private final QueryExecuteServiceImpl queryExecuteService;
     private final UtilProcess utilProcess;
 
-    @RabbitListener(queues = "execute", group = "executors")
+    @RabbitListener(queues = "${sql.queue.execute}", group = "executors")
     public List<ResponseExecuteSql> execute(RequestExecuteSql requestExecuteSql) {
         if (requestExecuteSql != null) {
             log.info("Execute sql user {}", requestExecuteSql.getUserId());

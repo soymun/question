@@ -37,5 +37,7 @@ databaseChangeLog:
       file: classpath:/db/changelog/db/tables/user_remote_service.sql
   - include:
       file: classpath:/db/changelog/db/tables/dc_report_param_type.sql
+  - include:
+      file: classpath:/db/changelog/db/tables/courses_type.sql
   - includeAll:
       path: classpath:/db/changelog/db/insert/

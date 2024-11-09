@@ -11,8 +11,8 @@ public interface CourseMarksRepository extends JpaRepository<CourseMarks, Long> 
 
     @Query(value = """
             from CourseMarks cm
-            where cm.courses.id = :cId and cm.countTask < (select count(ut.userTaskId.task.id) FROM UserTask ut where ut.userTaskId.task.courses.id = :cId)
-            order by cm.countTask
+            where cm.courses.id = :cId and cm.countTask <= (select count(ut.userTaskId.task.id) FROM UserTask ut where ut.userTaskId.task.courses.id = :cId)
+            order by cm.countTask desc
             limit 1""")
     CourseMarks getCourseMarksLessCountByCourseId(@Param("cId") Long courseId);
 

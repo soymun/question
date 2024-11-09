@@ -22,7 +22,7 @@ public class TaskInfoSql {
     @JoinColumn(name = "task_id")
     private Task task;
 
-    private String checkSql;
+    private String checkSql = "";
 
-    private String mainSql;
+    private String mainSql = "";
 }

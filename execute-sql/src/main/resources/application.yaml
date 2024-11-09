@@ -14,3 +14,9 @@ spring:
     template:
       exchange: courses
     host: rabbitmq
+
+sql:
+  queue:
+    check: postgresql-check
+    schema: postgresql-schema
+    execute: postgresql-execute

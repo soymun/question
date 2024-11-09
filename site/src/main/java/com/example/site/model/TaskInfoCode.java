@@ -29,11 +29,11 @@ public class TaskInfoCode {
     @JoinColumn(name = "code_type", nullable = false)
     private DcCodeType codeType;
 
-    private String initCode;
+    private String initCode = "";
 
-    private String checkCode;
+    private String checkCode = "";
 
-    private String checkClass;
+    private String checkClass = "";
 
-    private String userClass;
+    private String userClass = "";
 }

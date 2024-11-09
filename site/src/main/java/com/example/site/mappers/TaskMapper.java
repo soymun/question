@@ -50,7 +50,7 @@ public abstract class TaskMapper {
         taskCreateDtoToTask(taskAdminDto, task);
 
         switch (task.getTaskType()) {
-            case SQL -> {
+            case PostgreSQL, MySQL -> {
                 if (taskAdminDto.getTaskInfoSql() == null) {
                     throw new NotFoundException("TaskInfoSql not found");
                 }

@@ -7,6 +7,9 @@ import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.CourseMapper;
 import com.example.site.model.Courses;
+import com.example.site.model.User;
+import com.example.site.model.UserCourse;
+import com.example.site.model.UserCourseId;
 import com.example.site.model.util.CourseType;
 import com.example.site.repository.CourseRepository;
 import com.example.site.repository.UserCourseRepository;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,6 +69,18 @@ public class CourseServiceImpl implements CourseService {
             if (CourseType.USUALLY.equals(courses.getCourseType())) {
                 courses.setTimeExecute(null);
             }
+
+            CourseDto courseDto = courseMapper.courseToCourseDto(courseRepository.save(courses));
+            UserCourse userCourse = new UserCourse();
+            UserCourseId userCourseId = new UserCourseId();
+            userCourseId.setUser(new User(courseCreateDto.getUserCreated()));
+            userCourseId.setCourses(new Courses(courseDto.getId()));
+            userCourse.setUserCourseId(userCourseId);
+            userCourse.setDeleted(false);
+            userCourse.setClosed(false);
+            userCourse.setStartDate(LocalDateTime.now());
+            userCourseRepository.save(userCourse);
+
             return courseMapper.courseToCourseDto(courseRepository.save(courses));
         }
         throw new IllegalArgumentException("Курс не валиден");
@@ -112,7 +128,7 @@ public class CourseServiceImpl implements CourseService {
         Courses courses = courseRepository.findById(requestExecuteSql.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
         if (courses.getSchema() != null) {
             boolean adminSql = admin || courses.getUserCreated().getId().equals(userId);
-            return rabbitTemplate.convertSendAndReceiveAsType("execute", RequestExecuteSql
+            return rabbitTemplate.convertSendAndReceiveAsType(courses.getSqlType().getValue().toLowerCase() + "-execute", RequestExecuteSql
                     .builder()
                     .admin(adminSql)
                     .userId(userId)

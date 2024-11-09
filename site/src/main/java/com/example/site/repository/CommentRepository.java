@@ -13,6 +13,6 @@ public interface CommentRepository extends JpaRepository<Comments, Long> {
     @Query(value = "from Comments  c where c.task.id=:tId and c.apply = true ORDER BY c.createTime desc ")
     List<Comments> getAllByTaskIdAndApply(@Param("tId") Long taskId);
 
-    @Query(value = "from Comments  c where c.task.id=:tId and c.apply = false ORDER BY c.createTime desc ")
+    @Query(value = "from Comments  c where c.task.id=:tId ORDER BY c.createTime desc ")
     List<Comments> getAllByTaskIdAndNotApply(@Param("tId") Long taskId);
 }
