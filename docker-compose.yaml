@@ -45,7 +45,7 @@ services:
     networks:
       - network
     expose:
-      - 8883
+      - 8884
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_db:3306/stage
       - SPRING_DATASOURCE_USERNAME=root
@@ -55,7 +55,7 @@ services:
       - SQL_QUEUE_SCHEMA=mysql-schema
       - SQL_QUEUE_EXECUTE=mysql-execute
     ports:
-      - "8882:8882"
+      - "8884:8882"
     restart: unless-stopped
 
   mysql_db:
