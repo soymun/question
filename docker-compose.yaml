@@ -87,7 +87,7 @@ services:
     container_name: minio
     image: minio/minio:latest
     volumes:
-      - "/minio:/data"
+      - ./minio:/data
     ports:
       - "9000:9000"
       - "37207:37207"
