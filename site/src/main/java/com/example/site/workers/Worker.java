@@ -1,6 +1,9 @@
 package com.example.site.workers;
 
-import com.example.site.dto.*;
+import com.example.site.dto.CodeExecuteResponse;
+import com.example.site.dto.ResponseCheck;
+import com.example.site.dto.ResponseCheckSql;
+import com.example.site.dto.Status;
 import com.example.site.exception.NotFoundException;
 import com.example.site.model.CourseMarks;
 import com.example.site.model.TaskHistoryResult;
@@ -25,6 +28,7 @@ public class Worker {
     private final UserCourseRepository userCourseRepository;
 
     private final UserTaskRepository userTaskRepository;
+
     private final TaskRepository taskRepository;
 
 
@@ -32,26 +36,11 @@ public class Worker {
     @Transactional
     public void listener(ResponseCheckSql responseCheckSql) {
 
-        log.info("Result check sql");
+        log.info("Result check sql taskUserId {}", responseCheckSql.getTaskUserId());
 
         TaskHistoryResult taskHistoryResult = taskHistoryResultRepository.findById(responseCheckSql.getTaskUserId()).orElseThrow();
 
-        if (responseCheckSql.getStatus().equals(Status.OK)) {
-            taskRepository.updateRightAttempt(taskHistoryResult.getTask().getId());
-            taskHistoryResult.setRights(true);
-            taskHistoryResult.setMessage(responseCheckSql.getMessage());
-
-            UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(taskHistoryResult.getUser().getId(), taskHistoryResult.getTask().getId()).orElseThrow();
-
-            userTask.setRights(true);
-
-            userTaskRepository.save(userTask);
-
-            updateResult(userTask);
-        } else {
-            taskHistoryResult.setRights(false);
-            taskHistoryResult.setMessage(responseCheckSql.getMessage());
-        }
+        checkAndUpdateTaskResult(responseCheckSql, taskHistoryResult);
 
         taskHistoryResultRepository.save(taskHistoryResult);
     }
@@ -60,14 +49,20 @@ public class Worker {
     @Transactional
     public void listenerCode(CodeExecuteResponse responseCheckCode) {
 
-        log.info("Result check code");
+        log.info("Result check code taskUserId {}", responseCheckCode.getUserId());
 
         TaskHistoryResult taskHistoryResult = taskHistoryResultRepository.findById(responseCheckCode.getTaskId()).orElseThrow();
 
-        if (responseCheckCode.getStatus().equals(Status.OK)) {
+        checkAndUpdateTaskResult(responseCheckCode, taskHistoryResult);
+
+        taskHistoryResultRepository.save(taskHistoryResult);
+    }
+
+    private void checkAndUpdateTaskResult(ResponseCheck responseCheck, TaskHistoryResult taskHistoryResult) {
+        if (Status.OK.equals(responseCheck.getStatus())) {
             taskRepository.updateRightAttempt(taskHistoryResult.getTask().getId());
             taskHistoryResult.setRights(true);
-            taskHistoryResult.setMessage(responseCheckCode.getMessage());
+            taskHistoryResult.setMessage(responseCheck.getMessage());
 
             UserTask userTask = userTaskRepository.getUserTaskByTaskIdAndUserId(taskHistoryResult.getUser().getId(), taskHistoryResult.getTask().getId()).orElseThrow();
 
@@ -78,10 +73,8 @@ public class Worker {
             updateResult(userTask);
         } else {
             taskHistoryResult.setRights(false);
-            taskHistoryResult.setMessage(responseCheckCode.getMessage());
+            taskHistoryResult.setMessage(responseCheck.getMessage());
         }
-
-        taskHistoryResultRepository.save(taskHistoryResult);
     }
 
 

@@ -1,21 +1,15 @@
 package com.example.site.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseCheckSql {
+public class ResponseCheckSql extends ResponseCheck {
 
     private Long taskUserId;
 
-    private Status status;
-
     private Long executeTime;
-
-    private String message;
 }

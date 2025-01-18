@@ -1,19 +1,13 @@
 package com.example.site.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CodeExecuteResponse {
-
-    private Status status;
-
-    private String message;
+public class CodeExecuteResponse extends ResponseCheck {
 
     private Long userId;
 

@@ -45,8 +45,6 @@ public class UserServiceImpl implements UserService {
             User findUser = userRepository.findUserByEmail(username)
                     .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-            userRepository.save(findUser);
-
             log.info("Authorization user {}", findUser.getId());
 
             return new UserDetailImpl(findUser.getId(), findUser.getEmail(), findUser.getPassword(), findUser.getRole(), findUser.getRole().getAuthority(), findUser.getActive());
