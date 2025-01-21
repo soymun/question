@@ -8,6 +8,7 @@ import com.example.site.model.util.Role;
 import com.example.site.security.JwtTokenProvider;
 import com.example.site.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/registration")
-    @Operation(description = "Регистрация нового пользователя")
+    @Schema(description = "Регистрация нового пользователя")
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<ResultDto<?>> registration(@Valid @RequestBody UserCreateDto userCreateDto) {
         ResultDto<?> resultDto = new ResultDto<>();
@@ -47,7 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(description = "Аунтификация")
+    @Schema(description = "Аунтификация")
     public ResponseEntity<ResultDto<AuthDto>> login(@Valid @RequestBody LoginDto loginDTO) {
         ResultDto<AuthDto> resultDto = new ResultDto<>();
         try {
@@ -67,7 +68,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @Operation(description = "Обновить токен")
+    @Schema(description = "Обновить токен")
     public ResponseEntity<ResultDto<?>> refresh(@RequestHeader(name = "Authorization") String refresh) {
         try {
             AuthDto authDto = new AuthDto();

@@ -4,7 +4,9 @@ import com.example.site.dto.ResultDto;
 import com.example.site.dto.user.PasswordUpdateDto;
 import com.example.site.dto.user.UserDto;
 import com.example.site.dto.user.UserUpdateDto;
+import com.example.site.security.UserDetailImpl;
 import com.example.site.service.impl.UserServiceImpl;
+import com.example.site.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -49,8 +51,11 @@ public class UserController {
 
     @PutMapping("/change-password")
     @Operation(description = "Изменение пароля")
-    private ResponseEntity<ResultDto<UserDto>> passwordUpdate(@Valid @RequestBody PasswordUpdateDto passwordUpdateDto, @AuthenticationPrincipal(expression = "id") Long id, @AuthenticationPrincipal(expression = "grantedAuthorities") List<? extends GrantedAuthority> grantedAuthorities) {
-        if (passwordUpdateDto.getId().equals(id) || grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN"))) {
+    private ResponseEntity<ResultDto<UserDto>> passwordUpdate(@Valid @RequestBody PasswordUpdateDto passwordUpdateDto) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        if (passwordUpdateDto.getId().equals(userDetail.getId()) || userDetail.isAdmin()) {
             if (userService.updatePassword(passwordUpdateDto)) {
                 return ResponseEntity.ok().build();
             }

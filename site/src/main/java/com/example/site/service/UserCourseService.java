@@ -6,19 +6,21 @@ import java.util.List;
 
 public interface UserCourseService {
 
-    void saveUserCourse(Long userId, Long courseId, Long thisUser, boolean admin);
+    void saveUserCourse(Long userId, Long courseId);
 
-    void deleteCourse(Long userId, Long courseId, Long thisUser, boolean admin);
+    void deleteCourse(Long userId, Long courseId);
 
-    void deleteUserCoursesByGroupId(Long courseId, Long groupId, Long thisUser, boolean admin);
+    void deleteUserCoursesByGroupId(Long courseId, Long groupId);
 
-    List<UserCourseDto> getUserByCourseIdAndGroupId(Long courseId, Long groupId, Long thisUser, boolean admin);
+    List<UserCourseDto> getUserByCourseIdAndGroupId(Long courseId, Long groupId);
 
-    UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId, Long userId);
+    UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId);
 
-    void saveUserCourseGroup(Long groupId, Long courseId, Long thisUser, boolean admin);
+    void saveUserCourseGroup(Long groupId, Long courseId);
 
-    UserCourseDto addUserCourseByUserIdAndCourseId(Long courseId, Long userId, boolean admin);
+    UserCourseDto addUserCourseByCourse(Long courseId);
 
-    List<UserCourseDto> getCoursesToUser(Long userId);
+    UserCourseDto addUserCourseByUserIdAndCourseId(Long courseId, Long userId);
+
+    List<UserCourseDto> getCoursesToUser();
 }

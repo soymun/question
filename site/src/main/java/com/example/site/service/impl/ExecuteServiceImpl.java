@@ -9,6 +9,8 @@ import com.example.site.mappers.TaskMapper;
 import com.example.site.model.*;
 import com.example.site.model.util.TaskType;
 import com.example.site.repository.*;
+import com.example.site.security.UserDetailImpl;
+import com.example.site.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -50,7 +52,9 @@ public class ExecuteServiceImpl {
 
     private final TaskRepository taskRepository;
 
-    public ResultExecute execute(ExecuteDto executeDto, Long id) {
+    public ResultExecute execute(ExecuteDto executeDto) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
         Optional<Task> optionalTask = taskRepository.findById(executeDto.getTaskId());
 
@@ -60,11 +64,11 @@ public class ExecuteServiceImpl {
 
             return switch (task.getTaskType()) {
                 case NONE, FILE -> new ResultExecute();
-                case MySQL, PostgreSQL -> executeSql(executeDto.getExecuteSqlDto(), executeDto.getTaskId(), id, task.getTaskType());
+                case MySQL, PostgreSQL -> executeSql(executeDto.getExecuteSqlDto(), executeDto.getTaskId(), userDetail.getId(), task.getTaskType());
                 case QUESTION_BOX_ONE, QUESTION_BOX_MULTI ->
-                        executeBox(executeDto.getExecuteBoxDto(), executeDto.getTaskId(), id);
-                case QUESTION_TEXT -> executeText(executeDto.getExecuteTextDto(), executeDto.getTaskId(), id);
-                case CODE -> executeCode(executeDto.getExecuteCodeDto(), executeDto.getTaskId(), id);
+                        executeBox(executeDto.getExecuteBoxDto(), executeDto.getTaskId(), userDetail.getId());
+                case QUESTION_TEXT -> executeText(executeDto.getExecuteTextDto(), executeDto.getTaskId(), userDetail.getId());
+                case CODE -> executeCode(executeDto.getExecuteCodeDto(), executeDto.getTaskId(), userDetail.getId());
             };
 
         } else {

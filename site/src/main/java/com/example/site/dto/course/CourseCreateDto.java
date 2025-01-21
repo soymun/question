@@ -25,9 +25,6 @@ public class CourseCreateDto {
     @Schema(description = "Тип курса")
     private CourseType courseType;
 
-    @Schema(description = "Создатель курса")
-    private Long userCreated;
-
     @Schema(description = "Открытый/закрытый")
     private Boolean open;
 

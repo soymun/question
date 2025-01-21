@@ -63,4 +63,12 @@ public class UserDetailImpl implements UserDetails {
     public boolean isEnabled() {
         return enabled;
     }
+
+    public boolean isAdmin() {
+        return grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("ADMIN"));
+    }
+
+    public boolean isTeacher() {
+        return grantedAuthorities.stream().anyMatch(p -> p.getAuthority().equals("TEACHER"));
+    }
 }

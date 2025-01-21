@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CourseMarksService {
 
-    MarkDto saveMark(MarkCreateDto markCreateDto, Long id);
+    MarkDto saveMark(MarkCreateDto markCreateDto);
 
     void deleteMark(Long id);
 

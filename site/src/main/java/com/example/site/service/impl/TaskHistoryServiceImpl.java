@@ -3,7 +3,9 @@ package com.example.site.service.impl;
 import com.example.site.dto.history.HistoryDto;
 import com.example.site.mappers.TaskHistoryMapper;
 import com.example.site.repository.TaskHistoryResultRepository;
+import com.example.site.security.UserDetailImpl;
 import com.example.site.service.TaskHistoryResultService;
+import com.example.site.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +27,18 @@ public class TaskHistoryServiceImpl implements TaskHistoryResultService {
     }
 
     @Override
-    public List<HistoryDto> getAllByTaskAndUserId(Long task, Long userId) {
-        return repository.getAllByTaskIdAndUserId(task, userId).stream().map(taskHistoryMapper::taskHistoryToDto).toList();
+    public List<HistoryDto> getAllByTaskAndUserId(Long task) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return repository.getAllByTaskIdAndUserId(task, userDetail.getId()).stream().map(taskHistoryMapper::taskHistoryToDto).toList();
     }
 
     @Override
-    public List<HistoryDto> getAllByUserId(Long id) {
-        return repository.getAllByUserId(id).stream().map(taskHistoryMapper::taskHistoryToDto).toList();
+    public List<HistoryDto> getAllByUserId() {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return repository.getAllByUserId(userDetail.getId()).stream().map(taskHistoryMapper::taskHistoryToDto).toList();
     }
 }

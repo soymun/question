@@ -7,15 +7,15 @@ import java.util.List;
 
 public interface CourseService {
 
-    List<CourseDto> getAll(CourseRequestDto courseRequestDto, Long userId, boolean admin);
+    List<CourseDto> getAll(CourseRequestDto courseRequestDto);
 
-    CourseDto getById(Long id, Long userId, boolean admin);
+    CourseDto getById(Long id);
 
     CourseDto saveCourse(CourseCreateDto courseCreateDto);
 
-    CourseDto updateCourse(CourseUpdateDto courseUpdateDto, Long userId, boolean admin);
+    CourseDto updateCourse(CourseUpdateDto courseUpdateDto);
 
-    void deleteCourse(Long id, Long userId, boolean admin);
+    void deleteCourse(Long id);
 
-    List<ResponseExecuteSql> executeSqlInCourse(ExecuteSqlDto requestExecuteSql, Long userId, boolean admin);
+    List<ResponseExecuteSql> executeSqlInCourse(ExecuteSqlDto requestExecuteSql);
 }

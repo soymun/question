@@ -13,7 +13,10 @@ import com.example.site.model.UserCourseId;
 import com.example.site.model.util.CourseType;
 import com.example.site.repository.CourseRepository;
 import com.example.site.repository.UserCourseRepository;
+import com.example.site.repository.UserRepository;
+import com.example.site.security.UserDetailImpl;
 import com.example.site.service.CourseService;
+import com.example.site.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,17 +45,25 @@ public class CourseServiceImpl implements CourseService {
 
     private final UserCourseRepository userCourseRepository;
 
+    private final UserRepository userRepository;
+
     @Override
-    public List<CourseDto> getAll(CourseRequestDto courseRequestDto, Long userId, boolean admin) {
-        return courseRepository.getAll(userId, courseRequestDto.getQuery(), userId, admin, courseRequestDto.getTeacher()).stream()
+    public List<CourseDto> getAll(CourseRequestDto courseRequestDto) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return courseRepository.getAll(userDetail.getId(), courseRequestDto.getQuery(), userDetail.getId(), userDetail.isAdmin(), courseRequestDto.getTeacher()).stream()
                 .map(courseMapper::courseToCourseDto)
                 .toList();
     }
 
     @Override
-    public CourseDto getById(Long id, Long userId, boolean admin) {
+    public CourseDto getById(Long id) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
         Courses courses = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Курс не найден"));
-        if (admin || courses.getUserCreated().getId().equals(userId)) {
+        if (userDetail.isAdmin() || courses.getUserCreated().getId().equals(userDetail.getId())) {
             return courseMapper.courseToCourseDto(courses);
         }
         throw new ForbiddenException("Курс не доступен");
@@ -60,9 +71,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDto saveCourse(CourseCreateDto courseCreateDto) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
         if (courseCreateDto != null) {
 
-            log.info("Save course");
+            log.info("Save course user - {}", userDetail.getId());
 
             Courses courses = courseMapper.courseCreateDtoToCourse(courseCreateDto);
             courses.setDeleted(false);
@@ -73,7 +87,7 @@ public class CourseServiceImpl implements CourseService {
             CourseDto courseDto = courseMapper.courseToCourseDto(courseRepository.save(courses));
             UserCourse userCourse = new UserCourse();
             UserCourseId userCourseId = new UserCourseId();
-            userCourseId.setUser(new User(courseCreateDto.getUserCreated()));
+            userCourseId.setUser(userRepository.getReferenceById(userDetail.getId()));
             userCourseId.setCourses(new Courses(courseDto.getId()));
             userCourse.setUserCourseId(userCourseId);
             userCourse.setDeleted(false);
@@ -87,11 +101,14 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseDto updateCourse(CourseUpdateDto courseUpdateDto, Long userId, boolean admin) {
+    public CourseDto updateCourse(CourseUpdateDto courseUpdateDto) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
         if (courseUpdateDto != null) {
             log.info("Update course {}", courseUpdateDto.getId());
             Courses courses = courseRepository.findById(courseUpdateDto.getId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
-            if (admin || courses.getUserCreated().getId().equals(userId)) {
+            if (userDetail.isAdmin() || courses.getUserCreated().getId().equals(userDetail.getId())) {
                 ofNullable(courseUpdateDto.getCourseName()).ifPresent(courses::setCourseName);
                 ofNullable(courseUpdateDto.getAbout()).ifPresent(courses::setAbout);
                 ofNullable(courseUpdateDto.getCourseType()).ifPresent(courses::setCourseType);
@@ -106,12 +123,14 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void deleteCourse(Long id, Long userId, boolean admin) {
+    public void deleteCourse(Long id) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
         log.info("Delete course {}", id);
 
         Courses courses = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Курс не найден"));
-        if (admin || courses.getUserCreated().getId().equals(userId)) {
+        if (userDetail.isAdmin() || courses.getUserCreated().getId().equals(userDetail.getId())) {
             courses.setDeleted(true);
             courseRepository.save(courses);
             userCourseRepository.saveAll(userCourseRepository.getUserCourseByCourseId(courses.getId()).stream().peek(item -> item.setClosed(true)).collect(Collectors.toList()));
@@ -121,17 +140,19 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<ResponseExecuteSql> executeSqlInCourse(ExecuteSqlDto requestExecuteSql, Long userId, boolean admin) {
+    public List<ResponseExecuteSql> executeSqlInCourse(ExecuteSqlDto requestExecuteSql) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
         log.info("Execute sql");
 
         Courses courses = courseRepository.findById(requestExecuteSql.getCourseId()).orElseThrow(() -> new NotFoundException("Курс не найден"));
         if (courses.getSchema() != null) {
-            boolean adminSql = admin || courses.getUserCreated().getId().equals(userId);
+            boolean adminSql = userDetail.isAdmin() || courses.getUserCreated().getId().equals(userDetail.getId());
             return rabbitTemplate.convertSendAndReceiveAsType(courses.getSqlType().getValue().toLowerCase() + "-execute", RequestExecuteSql
                     .builder()
                     .admin(adminSql)
-                    .userId(userId)
+                    .userId(userDetail.getId())
                     .schema(courses.getSchema())
                     .userSql(requestExecuteSql.getUserSql())
                     .build(), new ParameterizedTypeReference<List<ResponseExecuteSql>>() {

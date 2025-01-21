@@ -15,11 +15,14 @@ import com.example.site.model.UserTask;
 import com.example.site.model.UserTaskId;
 import com.example.site.model.util.TaskType;
 import com.example.site.repository.*;
+import com.example.site.security.UserDetailImpl;
+import com.example.site.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -126,8 +129,11 @@ public class TaskServiceImpl {
         throw new NotFoundException("Не найдена задача");
     }
 
-    public TaskUserDto getToUser(Long id, Long userId) {
-        Optional<Task> optionalTask = userTaskRepository.getUserTaskByUserIdAndTaskId(userId, id);
+    public TaskUserDto getToUser(Long id) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        Optional<Task> optionalTask = userTaskRepository.getUserTaskByUserIdAndTaskId(userDetail.getId(), id);
         if (optionalTask.isPresent()) {
             Task task = optionalTask.get();
             return taskMapper.taskToUserDto(task);
@@ -137,7 +143,13 @@ public class TaskServiceImpl {
     }
 
 
-    public List<UserTaskDto> getTaskToUserByCourse(Long userId, Long courseId, Boolean admin) {
-        return userTaskRepository.getUserTaskByUserIdAndCourseIdToGet(userId, courseId, admin).stream().map(taskMapper::userTaskToUserTaskDto).collect(Collectors.toList());
+    public List<UserTaskDto> getTaskToUserByCourse(Long courseId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return userTaskRepository.getUserTaskByUserIdAndCourseIdToGet(userDetail.getId(), courseId, userDetail.isAdmin())
+                .stream()
+                .map(taskMapper::userTaskToUserTaskDto)
+                .collect(Collectors.toList());
     }
 }

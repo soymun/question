@@ -8,7 +8,10 @@ import com.example.site.model.CourseMarks;
 import com.example.site.model.User;
 import com.example.site.repository.CourseMarksRepository;
 import com.example.site.repository.UserCourseRepository;
+import com.example.site.repository.UserRepository;
+import com.example.site.security.UserDetailImpl;
 import com.example.site.service.CourseMarksService;
+import com.example.site.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,19 +26,25 @@ import java.util.List;
 public class CourseMarkServiceImpl implements CourseMarksService {
 
     private final CourseMarksRepository courseMarksRepository;
+
     private final UserCourseRepository userCourseRepository;
 
     private final CourseMarkMapper courseMarkMapper;
 
+    private final UserRepository userRepository;
+
     @Override
-    public MarkDto saveMark(MarkCreateDto markCreateDto, Long id) {
+    public MarkDto saveMark(MarkCreateDto markCreateDto) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
         if(markCreateDto != null){
 
             log.info("Create mark at courses {}", markCreateDto.getCourses());
 
             CourseMarks courseMarks = courseMarkMapper.markCreateDtoToCourseMarks(markCreateDto);
 
-            courseMarks.setUserCreated(new User(id));
+            courseMarks.setUserCreated(userRepository.getReferenceById(userDetail.getId()));
 
             CourseMarks courseMarksSaved = courseMarksRepository.save(courseMarks);
 

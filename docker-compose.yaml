@@ -14,6 +14,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=qwerty
       - MINIO_ENDPOINT=http://minio:9000
+      - SPRING_RABBITMQ_HOST=rabbitmq
     ports:
       - "8880:8880"
     restart: unless-stopped

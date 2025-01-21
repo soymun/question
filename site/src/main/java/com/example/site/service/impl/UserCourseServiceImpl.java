@@ -6,7 +6,9 @@ import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.UserCourseMapper;
 import com.example.site.model.*;
 import com.example.site.repository.*;
+import com.example.site.security.UserDetailImpl;
 import com.example.site.service.UserCourseService;
+import com.example.site.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,11 +38,13 @@ public class UserCourseServiceImpl implements UserCourseService {
 
 
     @Override
-    public void saveUserCourse(Long userId, Long courseId, Long thisUser, boolean admin) {
+    public void saveUserCourse(Long userId, Long courseId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
         log.info("Save course");
 
-        Courses findCourse = courseRepository.findByIdAndUserAndAdminAndUser(courseId, thisUser, admin).orElseThrow(() -> new NotFoundException("Курс не найден"));
+        Courses findCourse = courseRepository.findByIdAndUserAndAdminAndUser(courseId, userDetail.getId(), userDetail.isAdmin()).orElseThrow(() -> new NotFoundException("Курс не найден"));
 
         userTaskRepository.saveAll(taskRepository.findAllByCourseId(findCourse.getId()).stream().map(task -> new UserTask(new UserTaskId(userId, task.getId()), false, false, 1L)).toList());
 
@@ -48,11 +52,13 @@ public class UserCourseServiceImpl implements UserCourseService {
     }
 
     @Override
-    public void saveUserCourseGroup(Long groupId, Long courseId, Long thisUser, boolean admin) {
+    public void saveUserCourseGroup(Long groupId, Long courseId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
         log.info("Save course");
 
-        Courses findCourse = courseRepository.findByIdAndUserAndAdminAndUser(courseId, thisUser, admin).orElseThrow(() -> new NotFoundException("Курс не найден"));
+        Courses findCourse = courseRepository.findByIdAndUserAndAdminAndUser(courseId, userDetail.getId(), userDetail.isAdmin()).orElseThrow(() -> new NotFoundException("Курс не найден"));
 
         userRepository.findUserByGroupId(groupId).forEach(user -> {
 
@@ -65,11 +71,13 @@ public class UserCourseServiceImpl implements UserCourseService {
     }
 
     @Override
-    public void deleteCourse(Long userId, Long courseId, Long thisUser, boolean admin) {
+    public void deleteCourse(Long userId, Long courseId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
         log.info("Delete course {}", courseId);
 
-        UserCourse userCourse = userCourseRepository.getUserCourseByUserIdAndCourseAndTeacherAndAdmin(userId, courseId, thisUser, admin).orElseThrow(() -> new NotFoundException("Курс не найден"));
+        UserCourse userCourse = userCourseRepository.getUserCourseByUserIdAndCourseAndTeacherAndAdmin(userId, courseId, userDetail.getId(), userDetail.isAdmin()).orElseThrow(() -> new NotFoundException("Курс не найден"));
 
         userCourse.setDeleted(true);
 
@@ -80,11 +88,13 @@ public class UserCourseServiceImpl implements UserCourseService {
     }
 
     @Override
-    public void deleteUserCoursesByGroupId(Long courseId, Long groupId, Long thisUser, boolean admin) {
+    public void deleteUserCoursesByGroupId(Long courseId, Long groupId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
         log.info("Delete course {} group {}", courseId, groupId);
 
-        List<UserCourse> userCourse = userCourseRepository.getAllByCourseIdAndGroupId(groupId, courseId, thisUser, admin).stream().peek(uc -> uc.setDeleted(true)).toList();
+        List<UserCourse> userCourse = userCourseRepository.getAllByCourseIdAndGroupId(groupId, courseId, userDetail.getId(), userDetail.isAdmin()).stream().peek(uc -> uc.setDeleted(true)).toList();
 
         userTaskRepository.saveAll(userTaskRepository.getUserTaskByGroupIdAndCourseId(groupId, courseId).stream().peek(ut -> ut.setClosed(true)).toList());
 
@@ -92,24 +102,46 @@ public class UserCourseServiceImpl implements UserCourseService {
     }
 
     @Override
-    public List<UserCourseDto> getUserByCourseIdAndGroupId(Long courseId, Long groupId, Long thisUser, boolean admin) {
-        return userCourseRepository.getAllByCourseIdAndGroupId(groupId, courseId, thisUser, admin).stream().map(userCourseMapper::userCourseToUserCourseDto).toList();
+    public List<UserCourseDto> getUserByCourseIdAndGroupId(Long courseId, Long groupId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return userCourseRepository
+                .getAllByCourseIdAndGroupId(groupId, courseId, userDetail.getId(), userDetail.isAdmin())
+                .stream()
+                .map(userCourseMapper::userCourseToUserCourseDto).toList();
     }
 
     @Override
-    public UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId, Long userId) {
-        return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.findById(new UserCourseId(userId, courseId)).orElseThrow(() -> new  NotFoundException("Курс не найден")));
+    public UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.findById(new UserCourseId(userDetail.getId(), courseId)).orElseThrow(() -> new  NotFoundException("Курс не найден")));
     }
 
     @Override
-    public List<UserCourseDto> getCoursesToUser(Long userId) {
-        return userCourseRepository.getByUserId(userId).stream().map(userCourseMapper::userCourseToUserCourseDto).toList();
+    public List<UserCourseDto> getCoursesToUser() {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return userCourseRepository.getByUserId(userDetail.getId()).stream().map(userCourseMapper::userCourseToUserCourseDto).toList();
     }
 
     @Override
-    public UserCourseDto addUserCourseByUserIdAndCourseId(Long courseId, Long userId, boolean admin) {
+    public UserCourseDto addUserCourseByCourse(Long courseId){
 
-        Optional<Courses> optionalCourses = courseRepository.findByIdAndUserAndAdminAndUser(courseId, userId, admin);
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return addUserCourseByUserIdAndCourseId(courseId, userDetail.getId());
+    }
+
+    @Override
+    public UserCourseDto addUserCourseByUserIdAndCourseId(Long courseId, Long userId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        Optional<Courses> optionalCourses = courseRepository.findByIdAndUserAndAdminAndUser(courseId, userId, userDetail.isAdmin());
 
         if (optionalCourses.isPresent()) {
             Courses courses = optionalCourses.get();

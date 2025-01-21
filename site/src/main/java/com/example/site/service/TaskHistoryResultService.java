@@ -8,8 +8,8 @@ public interface TaskHistoryResultService {
 
     List<HistoryDto> getAllByTask(Long taskId);
 
-    List<HistoryDto> getAllByTaskAndUserId(Long task, Long userId);
+    List<HistoryDto> getAllByTaskAndUserId(Long task);
 
-    List<HistoryDto> getAllByUserId(Long id);
+    List<HistoryDto> getAllByUserId();
 
 }

@@ -58,7 +58,7 @@ public class GroupController {
         return ResponseEntity.ok(new ResultDto<>(groupService.saveGroup(groupCreateDto)));
     }
 
-    @PatchMapping
+    @PutMapping
     @Operation(description = "Изменение группы")
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<ResultDto<GroupDto>> updateGroup(@Valid @RequestBody GroupDto groupCreateDto){

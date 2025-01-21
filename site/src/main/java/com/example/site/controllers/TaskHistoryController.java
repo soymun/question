@@ -5,6 +5,7 @@ import com.example.site.dto.history.HistoryDto;
 import com.example.site.security.UserDetailImpl;
 import com.example.site.service.impl.TaskHistoryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,20 +28,20 @@ public class TaskHistoryController {
 
     @GetMapping("/task/{id}")
     @PreAuthorize("hasAuthority('TEACHER')")
-    @Operation(description = "Получение всех по задаче")
+    @Schema(description = "Получение всех по задаче")
     public ResponseEntity<ResultDto<List<HistoryDto>>> getAllByTaskAll(@PathVariable Long id){
         return ResponseEntity.ok(new ResultDto<>(taskHistoryService.getAllByTask(id)));
     }
 
     @GetMapping("/task/user/{id}")
-    @Operation(description = "Получение всех по задаче и пользователю")
-    public ResponseEntity<ResultDto<List<HistoryDto>>> getAllByTaskAndUserAll(@PathVariable Long id, @AuthenticationPrincipal UserDetailImpl principal){
-        return ResponseEntity.ok(new ResultDto<>(taskHistoryService.getAllByTaskAndUserId(id, principal.getId())));
+    @Schema(description = "Получение всех по задаче и пользователю")
+    public ResponseEntity<ResultDto<List<HistoryDto>>> getAllByTaskAndUserAll(@PathVariable Long id){
+        return ResponseEntity.ok(new ResultDto<>(taskHistoryService.getAllByTaskAndUserId(id)));
     }
 
     @GetMapping("/user/{id}")
-    @Operation(description = "Получение по пользователю")
-    public ResponseEntity<ResultDto<List<HistoryDto>>> getAllByUserAll(@AuthenticationPrincipal UserDetailImpl principal){
-        return ResponseEntity.ok(new ResultDto<>(taskHistoryService.getAllByUserId(principal.getId())));
+    @Schema(description = "Получение по пользователю")
+    public ResponseEntity<ResultDto<List<HistoryDto>>> getAllByUser(){
+        return ResponseEntity.ok(new ResultDto<>(taskHistoryService.getAllByUserId()));
     }
 }
