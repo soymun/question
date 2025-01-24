@@ -37,8 +37,16 @@ public class UserController {
     @GetMapping("/{id}")
     @Operation(description = "Получение пользователя")
     private ResponseEntity<ResultDto<UserDto>> getUserById(@PathVariable Long id) {
-        log.info("" + id);
         return ResponseEntity.ok(new ResultDto<>(userService.findById(id)));
+    }
+
+    @GetMapping("/user")
+    @Operation(description = "Получение пользователя")
+    private ResponseEntity<ResultDto<UserDto>> getUser() {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return ResponseEntity.ok(new ResultDto<>(userService.findById(userDetail.getId())));
     }
 
     @DeleteMapping("/{id}")
