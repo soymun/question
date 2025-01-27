@@ -34,7 +34,7 @@ public class ExecuteSqlWorker {
                 } else {
                     return List.of(ResponseExecuteSql
                             .builder()
-                            .message("Sql is not validated. Delete schemas names.")
+                            .message("Sql is not validated.")
                             .userId(requestExecuteSql.getUserId())
                             .build());
                 }

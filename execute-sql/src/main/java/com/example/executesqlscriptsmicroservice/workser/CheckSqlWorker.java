@@ -37,7 +37,7 @@ public class CheckSqlWorker {
                 rabbitTemplate.convertAndSend("result", ResponseCheckSql
                         .builder()
                                 .status(Status.ERROR)
-                                .message("Sql is not validated. Delete schemas names.")
+                                .message("Sql is not validated.")
                         .build());
             }
         }
