@@ -59,9 +59,9 @@ public class Task {
     @Column(name = "right_attempt")
     private Long rightAttempt;
 
-    private Boolean deleted;
+    private boolean deleted;
 
-    private Boolean open;
+    private boolean open;
 
     public Task(Long id) {
         this.id = id;
