@@ -22,6 +22,7 @@
         <module>site</module>
         <module>execute-sql</module>
         <module>java-execute</module>
+        <module>notification</module>
     </modules>
 
 </project>

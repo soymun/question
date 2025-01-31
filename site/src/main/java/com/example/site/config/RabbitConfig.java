@@ -68,6 +68,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue pythonQueue(){
+        return new Queue("PYTHON", true);
+    }
+
+    @Bean
     public Binding resultBinding(){
         return BindingBuilder.bind(resultQueue()).to(directExchange()).with("result");
     }
@@ -110,5 +115,10 @@ public class RabbitConfig {
     @Bean
     public Binding javaBinding(){
         return BindingBuilder.bind(javaQueue()).to(directExchange()).with("java");
+    }
+
+    @Bean
+    public Binding pythonBinding(){
+        return BindingBuilder.bind(pythonQueue()).to(directExchange()).with("python");
     }
 }

@@ -45,6 +45,10 @@ public class MinioConfig {
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(BucketUtil.Buckets.FILES.value).build())) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(BucketUtil.Buckets.FILES.value).build());
             }
+
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(BucketUtil.Buckets.NOTIFICATION.value).build())) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(BucketUtil.Buckets.NOTIFICATION.value).build());
+            }
         } catch (Exception e) {
             log.error("Ошибка", e);
         }

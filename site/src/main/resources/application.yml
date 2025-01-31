@@ -2,7 +2,12 @@ server:
   port: 8880
   servlet:
     context-path: /api
+
 spring:
+  task:
+    scheduling:
+      pool:
+        size: 10
   application:
     name: site
   jpa:

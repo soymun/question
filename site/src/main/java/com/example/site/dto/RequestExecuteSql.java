@@ -18,4 +18,6 @@ public class RequestExecuteSql {
     private Long userId;
 
     private Boolean admin;
+
+    private Boolean sandBox;
 }

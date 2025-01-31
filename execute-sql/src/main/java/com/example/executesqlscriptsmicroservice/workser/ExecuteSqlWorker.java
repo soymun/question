@@ -2,7 +2,8 @@ package com.example.executesqlscriptsmicroservice.workser;
 
 import com.example.executesqlscriptsmicroservice.chain.Context;
 import com.example.executesqlscriptsmicroservice.chain.UtilProcess;
-import com.example.executesqlscriptsmicroservice.dto.*;
+import com.example.executesqlscriptsmicroservice.dto.RequestExecuteSql;
+import com.example.executesqlscriptsmicroservice.dto.ResponseExecuteSql;
 import com.example.executesqlscriptsmicroservice.service.impl.QueryExecuteServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,18 +26,19 @@ public class ExecuteSqlWorker {
             log.info("Execute sql user {}", requestExecuteSql.getUserId());
             if (requestExecuteSql.getSchema() != null) {
                 Context context = utilProcess.process(requestExecuteSql.getUserSql(), 1);
-                if(context.verified) {
-                    if (requestExecuteSql.getAdmin()) {
-                        return queryExecuteService.executeSqlAdmin(requestExecuteSql);
-                    } else {
-                        return queryExecuteService.executeSqlUser(requestExecuteSql);
-                    }
-                } else {
+
+                if (requestExecuteSql.getAdmin()) {
+                    return queryExecuteService.executeSqlAdmin(requestExecuteSql);
+                } else if (context.verified && requestExecuteSql.getSandBox()) {
+                    return queryExecuteService.executeSqlAdmin(requestExecuteSql);
+                } else if (!context.verified) {
                     return List.of(ResponseExecuteSql
                             .builder()
                             .message("Sql is not validated.")
                             .userId(requestExecuteSql.getUserId())
                             .build());
+                } else {
+                    return queryExecuteService.executeSqlUser(requestExecuteSql);
                 }
             }
             return List.of(ResponseExecuteSql

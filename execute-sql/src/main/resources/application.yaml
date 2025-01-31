@@ -13,7 +13,7 @@ spring:
   rabbitmq:
     template:
       exchange: courses
-    host: rabbitmq
+    host: localhost
 
 sql:
   queue:

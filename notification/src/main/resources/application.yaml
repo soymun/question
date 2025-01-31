@@ -1,0 +1,21 @@
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  application:
+    name: notification
+
+
+minio:
+  login: usercoffeemachine
+  password: usercoffeemachine
+  endpoint: http://localhost:9000

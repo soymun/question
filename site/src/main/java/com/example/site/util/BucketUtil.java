@@ -4,7 +4,7 @@ public class BucketUtil {
 
     public enum Buckets {
 
-        REPORTS("reports"), FILES("files");
+        REPORTS("reports"), FILES("files"), NOTIFICATION("notification");
 
         public final String value;
 
