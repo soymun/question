@@ -1,7 +1,7 @@
 version: "1"
 services:
   question:
-    image: soymun/site:1.0.4
+    image: soymun/site:1.0.5
     depends_on:
       - postgres_db
       - rabbitmq
@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
 
   sql:
-    image: soymun/execute-sql:1.0.4
+    image: soymun/execute-sql:1.0.5
     depends_on:
       - postgres_db
       - rabbitmq
@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
 
   sql-mysql:
-    image: soymun/execute-sql:1.0.4
+    image: soymun/execute-sql:1.0.5
     depends_on:
       - mysql_db
       - rabbitmq
@@ -73,7 +73,7 @@ services:
       - ./dbdata:/var/lib/mysql/
 
   java-execute:
-    image: soymun/java-execute:1.0.4
+    image: soymun/java-execute:1.0.5
     depends_on:
       - question
     networks:
@@ -132,7 +132,7 @@ services:
       - ./postgres_data:/var/lib/postgresql/data
 
   python-execute:
-    image: soymun/python-execute
+    image: soymun/python-execute:1.0.5
     networks:
       - network
     depends_on:
