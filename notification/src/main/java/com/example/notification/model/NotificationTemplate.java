@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "notification_template", schema = "notification")
 public class NotificationTemplate {
 
     @Id

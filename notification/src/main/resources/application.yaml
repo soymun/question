@@ -1,19 +1,25 @@
-
 spring:
+  datasource:
+    username: postgres
+    password: qwerty
+    url: jdbc:postgresql://localhost:5432/postgres
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: test
-    password: test
+    host: smtp.yandex.ru
+    port: 465
+    username: шо ты тут ищешь?
+    password:
     properties:
       mail:
         smtp:
-          auth: true
-          starttls:
-            enable: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+          socketFactory:
+            fallback: true
+    ssl:
+      enabled: true
   application:
     name: notification
-
 
 minio:
   login: usercoffeemachine

@@ -48,3 +48,10 @@ jobs:
           context: ./python/
           push: true
           tags: soymun/python-execute:${{ github.ref_name }}
+
+      - name: Build and push python execute
+        uses: docker/build-push-action@v6
+        with:
+          context: ./notification/
+          push: true
+          tags: soymun/notification:${{ github.ref_name }}
