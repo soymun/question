@@ -1,5 +1,6 @@
 package com.example.site.service.impl;
 
+import com.example.site.dto.notification.NotificationType;
 import com.example.site.dto.user.*;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.UserMapper;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
@@ -38,6 +40,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
+
+    private final NotificationService notificationService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -79,7 +83,12 @@ public class UserServiceImpl implements UserService {
             User mappedUser = userMapper.userCreateDtoToUser(userCreateDto);
             mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
             mappedUser.setRole(Role.USER);
-            return userMapper.userToUserDto(userRepository.save(mappedUser));
+
+            UserDto userDto = userMapper.userToUserDto(userRepository.save(mappedUser));
+
+            notificationService.sendNotification(mappedUser.getEmail(), NotificationType.REGISTRATION, Map.of());
+
+            return userDto;
         }
         throw new NotFoundException("Пользователь не валиден");
     }
@@ -124,6 +133,9 @@ public class UserServiceImpl implements UserService {
             if (passwordEncoder.matches(passwordUpdateDto.getPrevPassword(), user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(passwordUpdateDto.getNewPassword()));
                 userRepository.save(user);
+
+                notificationService.sendNotification(user.getEmail(), NotificationType.PASSWORD, Map.of());
+
                 return true;
             }
             throw new IllegalArgumentException("Пароли не совпадают");

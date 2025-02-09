@@ -1,11 +1,12 @@
-package com.example.notification.dto;
+package com.example.site.dto.notification;
 
-import com.example.notification.model.NotificationType;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
+@Builder
 public class NotificationDto {
 
     private Map<String, Object> values;

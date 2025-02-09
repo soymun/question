@@ -1,5 +1,6 @@
 package com.example.site.service.impl;
 
+import com.example.site.dto.notification.NotificationType;
 import com.example.site.dto.usercourse.UserCourseDto;
 import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -36,6 +38,7 @@ public class UserCourseServiceImpl implements UserCourseService {
 
     private final UserRepository userRepository;
 
+    private final NotificationService notificationService;
 
     @Override
     public void saveUserCourse(Long userId, Long courseId) {
@@ -48,7 +51,13 @@ public class UserCourseServiceImpl implements UserCourseService {
 
         userTaskRepository.saveAll(taskRepository.findAllByCourseId(findCourse.getId()).stream().map(task -> new UserTask(new UserTaskId(userId, task.getId()), false, false, 1L)).toList());
 
-        userCourseRepository.save(new UserCourse(new UserCourseId(userId, findCourse.getId()), LocalDateTime.now(), false, false,null));
+        userCourseRepository.save(new UserCourse(new UserCourseId(userId, findCourse.getId()), LocalDateTime.now(), false, false, null));
+
+        User user = userRepository.getReferenceById(userId);
+
+        notificationService.sendNotification(user.getEmail(), NotificationType.ADD_TO_COURSES, Map.of(
+                "courseName", findCourse.getCourseName()
+        ));
     }
 
     @Override
@@ -64,8 +73,11 @@ public class UserCourseServiceImpl implements UserCourseService {
 
             userTaskRepository.saveAll(taskRepository.findAllByCourseId(findCourse.getId()).stream().map(task -> new UserTask(new UserTaskId(user.getId(), task.getId()), false, false, 1L)).toList());
 
-            userCourseRepository.save(new UserCourse(new UserCourseId(user.getId(), findCourse.getId()), LocalDateTime.now(), false, false,null));
+            userCourseRepository.save(new UserCourse(new UserCourseId(user.getId(), findCourse.getId()), LocalDateTime.now(), false, false, null));
 
+            notificationService.sendNotification(user.getEmail(), NotificationType.ADD_TO_COURSES, Map.of(
+                    "courseName", findCourse.getCourseName()
+            ));
         });
 
     }
@@ -117,7 +129,7 @@ public class UserCourseServiceImpl implements UserCourseService {
 
         UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
-        return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.findById(new UserCourseId(userDetail.getId(), courseId)).orElseThrow(() -> new  NotFoundException("Курс не найден")));
+        return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.findById(new UserCourseId(userDetail.getId(), courseId)).orElseThrow(() -> new NotFoundException("Курс не найден")));
     }
 
     @Override
@@ -129,7 +141,7 @@ public class UserCourseServiceImpl implements UserCourseService {
     }
 
     @Override
-    public UserCourseDto addUserCourseByCourse(Long courseId){
+    public UserCourseDto addUserCourseByCourse(Long courseId) {
 
         UserDetailImpl userDetail = SecurityUtil.getUserDetail();
 
@@ -148,7 +160,13 @@ public class UserCourseServiceImpl implements UserCourseService {
 
             userTaskRepository.saveAll(taskRepository.findAllByCourseId(courses.getId()).stream().map(task -> new UserTask(new UserTaskId(userId, task.getId()), false, false, 0L)).toList());
 
-            return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.save(new UserCourse(new UserCourseId(userId, courses.getId()), LocalDateTime.now(), false, false,null)));
+            User user = userRepository.getReferenceById(userId);
+
+            notificationService.sendNotification(user.getEmail(), NotificationType.ADD_TO_COURSES, Map.of(
+                    "courseName", courses.getCourseName()
+            ));
+
+            return userCourseMapper.userCourseToUserCourseDto(userCourseRepository.save(new UserCourse(new UserCourseId(userId, courses.getId()), LocalDateTime.now(), false, false, null)));
         }
 
         throw new ForbiddenException("Курс не найден");

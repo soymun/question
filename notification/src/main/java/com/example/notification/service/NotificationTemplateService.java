@@ -46,7 +46,7 @@ public class NotificationTemplateService {
 
         NotificationTemplate notificationTemplate = notificationTemplates.get(0);
 
-        mimeMessageHelper.setSubject(notificationDto.getSubject());
+        mimeMessageHelper.setSubject(notificationTemplate.getSubject());
 
         IContext context = new Context(new Locale("ru-RU"), notificationDto.getValues());
 

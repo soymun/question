@@ -21,6 +21,9 @@ public class NotificationTemplate {
     @Enumerated(EnumType.ORDINAL)
     private NotificationType notificationType;
 
+    @Column(name = "subject")
+    private String subject;
+
     @Column(name = "file_name")
     private String fileName;
 

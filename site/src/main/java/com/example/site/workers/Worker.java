@@ -4,17 +4,21 @@ import com.example.site.dto.CodeExecuteResponse;
 import com.example.site.dto.ResponseCheck;
 import com.example.site.dto.ResponseCheckSql;
 import com.example.site.dto.Status;
+import com.example.site.dto.notification.NotificationType;
 import com.example.site.exception.NotFoundException;
 import com.example.site.model.CourseMarks;
 import com.example.site.model.TaskHistoryResult;
 import com.example.site.model.UserCourse;
 import com.example.site.model.UserTask;
 import com.example.site.repository.*;
+import com.example.site.service.impl.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -31,6 +35,7 @@ public class Worker {
 
     private final TaskRepository taskRepository;
 
+    private final NotificationService notificationService;
 
     @RabbitListener(queues = "result", group = "result")
     @Transactional
@@ -75,6 +80,12 @@ public class Worker {
             taskHistoryResult.setRights(false);
             taskHistoryResult.setMessage(responseCheck.getMessage());
         }
+
+        notificationService.sendNotification(taskHistoryResult.getUser().getEmail(), NotificationType.CONFIRM_TASK,
+                Map.of(
+                        "taskName", taskHistoryResult.getTask().getName()
+                )
+        );
     }
 
 
