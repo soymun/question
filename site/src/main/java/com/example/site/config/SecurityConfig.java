@@ -28,7 +28,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/file/file/jpg/**",
-            "/sandbox/open"
+            "/sandbox/open",
+            "file/file/*"
     };
 
     @Bean

@@ -31,8 +31,14 @@ public class Task {
 
     private String title;
 
+    private String file;
+
     @Enumerated(value = EnumType.ORDINAL)
     private TaskType taskType;
+
+    @ManyToOne
+    @JoinColumn(name = "task_group_id", referencedColumnName = "id")
+    private TaskGroup taskGroup;
 
     @ManyToOne
     @JoinColumn(name = "course_id")

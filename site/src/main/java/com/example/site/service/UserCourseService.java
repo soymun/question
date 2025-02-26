@@ -1,6 +1,7 @@
 package com.example.site.service;
 
 import com.example.site.dto.usercourse.UserCourseDto;
+import com.example.site.dto.usercourse.UserCourseWithUserTaskDto;
 
 import java.util.List;
 
@@ -12,7 +13,10 @@ public interface UserCourseService {
 
     void deleteUserCoursesByGroupId(Long courseId, Long groupId);
 
+    @Deprecated
     List<UserCourseDto> getUserByCourseIdAndGroupId(Long courseId, Long groupId);
+
+    List<UserCourseWithUserTaskDto> getUserByCourseIdAndGroupIdv2(Long courseId, Long groupId);
 
     UserCourseDto getUserCourseByUserIdAndCourseId(Long courseId);
 

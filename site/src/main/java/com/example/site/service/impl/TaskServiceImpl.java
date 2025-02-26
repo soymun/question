@@ -115,6 +115,7 @@ public class TaskServiceImpl {
     }
 
 
+    @Deprecated
     public List<TaskDto> getAllByCourseId(Long id) {
         return taskRepository.findAllByCourseId(id).stream().map(taskMapper::taskToTaskDto).toList();
     }
@@ -143,6 +144,7 @@ public class TaskServiceImpl {
     }
 
 
+    @Deprecated
     public List<UserTaskDto> getTaskToUserByCourse(Long courseId) {
 
         UserDetailImpl userDetail = SecurityUtil.getUserDetail();
@@ -151,5 +153,19 @@ public class TaskServiceImpl {
                 .stream()
                 .map(taskMapper::userTaskToUserTaskDto)
                 .collect(Collectors.toList());
+    }
+
+    public List<UserTaskDto> getTaskToUserByCourseAndTaskGroup(Long courseId, Long taskGroupId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        return userTaskRepository.getUserTaskByUserIdAndCourseIdToGetAndTaskGroup(userDetail.getId(), courseId, userDetail.isAdmin(), taskGroupId)
+                .stream()
+                .map(taskMapper::userTaskToUserTaskDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TaskDto> getAllByCourseIdAndTaskGroup(Long id, Long taskGroupId) {
+        return taskRepository.findAllByCourseIdAndTaskGroup(id, taskGroupId).stream().map(taskMapper::taskToTaskDto).toList();
     }
 }

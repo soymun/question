@@ -56,6 +56,19 @@ public class TaskController {
         return ResponseEntity.ok(new ResultDto<>(taskService.getTaskToUserByCourse(id)));
     }
 
+    @GetMapping("/v2/search/course/{id}/{tgId}")
+    @Schema(description = "Получить все задачи")
+    @PreAuthorize(value = "hasAuthority('TEACHER')")
+    public ResponseEntity<ResultDto<List<TaskDto>>> getAllByCourseIdAndTaskGroup(@PathVariable Long id, @PathVariable Long tgId) {
+        return ResponseEntity.ok(new ResultDto<>(taskService.getAllByCourseIdAndTaskGroup(id, tgId)));
+    }
+
+    @GetMapping("/v2/search/user/course/{id}/{tgId}")
+    @Schema(description = "Получить все задачи для пользователя по курсу")
+    public ResponseEntity<ResultDto<List<UserTaskDto>>> getAllByQueryUserAndTaskGroup(@PathVariable Long id, @PathVariable Long tgId) {
+        return ResponseEntity.ok(new ResultDto<>(taskService.getTaskToUserByCourseAndTaskGroup(id, tgId)));
+    }
+
     @GetMapping("/{id}")
     @Schema(description = "Получить для пользователя")
     public ResponseEntity<ResultDto<TaskUserDto>> getToUser(@PathVariable Long id) {

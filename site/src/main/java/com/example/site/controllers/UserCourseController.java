@@ -4,8 +4,8 @@ import com.example.site.dto.ResultDto;
 import com.example.site.dto.course.CourseDto;
 import com.example.site.dto.usercourse.UserCourseCreateDto;
 import com.example.site.dto.usercourse.UserCourseDto;
+import com.example.site.dto.usercourse.UserCourseWithUserTaskDto;
 import com.example.site.service.impl.UserCourseServiceImpl;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -54,6 +54,13 @@ public class UserCourseController {
     @Schema(description = "Получение результатов пользователей по id курсу и группе")
     public ResponseEntity<ResultDto<List<UserCourseDto>>> getUserByCourseIdAndGroupId(@PathVariable Long id, @PathVariable Long gId) {
         return ResponseEntity.ok(new ResultDto<>(userCourseService.getUserByCourseIdAndGroupId(id, gId)));
+    }
+
+    @GetMapping("/v2/course/{id}/group/{gId}")
+    @PreAuthorize("hasAuthority('TEACHER')")
+    @Schema(description = "Получение результатов пользователей по id курсу и группе")
+    public ResponseEntity<ResultDto<List<UserCourseWithUserTaskDto>>> getUserByCourseIdAndGroupIdV2(@PathVariable Long id, @PathVariable Long gId) {
+        return ResponseEntity.ok(new ResultDto<>(userCourseService.getUserByCourseIdAndGroupIdv2(id, gId)));
     }
 
     @PostMapping

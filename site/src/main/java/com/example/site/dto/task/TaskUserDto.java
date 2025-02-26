@@ -26,6 +26,12 @@ public class TaskUserDto {
     @Schema(description = "Заголовок")
     private String title;
 
+    @Schema(description = "Вложенный файл")
+    private String file;
+
+    @NotNull
+    private Long taskGroup;
+
     @NotNull
     @Schema(description = "Тип задачи")
     private TaskType taskType;

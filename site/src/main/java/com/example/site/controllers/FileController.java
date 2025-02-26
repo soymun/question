@@ -3,10 +3,12 @@ package com.example.site.controllers;
 import com.example.site.dto.ResultDto;
 import com.example.site.service.FileService;
 import com.example.site.util.BucketUtil;
+import io.minio.GetObjectResponse;
 import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,9 +42,9 @@ public class FileController {
     }
 
     @Operation(description = "Получить файл")
-    @GetMapping(value = "/file/{name}")
+    @GetMapping(value = "/file/{name}", produces = {"application/octet-stream"})
     public ResponseEntity<Resource> getFile(@PathVariable String name) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        return ResponseEntity.ok(fileService.downloadFile(name, BucketUtil.Buckets.FILES.value));
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"").body(fileService.downloadFile(name, BucketUtil.Buckets.FILES.value));
     }
 
     @Operation(description = "Получить файл")

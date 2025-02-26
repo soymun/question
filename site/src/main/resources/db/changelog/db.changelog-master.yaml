@@ -39,5 +39,7 @@ databaseChangeLog:
       file: classpath:/db/changelog/db/tables/dc_report_param_type.sql
   - include:
       file: classpath:/db/changelog/db/tables/courses_type.sql
+  - include:
+      file: classpath:/db/changelog/db/tables/task_group.sql
   - includeAll:
       path: classpath:/db/changelog/db/insert/

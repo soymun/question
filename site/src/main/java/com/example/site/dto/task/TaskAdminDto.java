@@ -35,6 +35,12 @@ public class TaskAdminDto {
     @Schema(description = "ID курса")
     private Long courses;
 
+    @NotNull
+    private Long taskGroup;
+
+    @Schema(description = "Вложенный файл")
+    private String file;
+
     @Schema(description = "Открытость")
     private Boolean open;
 

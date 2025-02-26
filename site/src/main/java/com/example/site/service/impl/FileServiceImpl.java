@@ -28,9 +28,9 @@ public class FileServiceImpl implements FileService {
 
         log.info("File upload {}", multipartFile.getName());
 
-        String[] type = multipartFile.getName().split("\\.");
+        String[] type = multipartFile.getOriginalFilename().split("\\.");
 
-        String random = UUID.randomUUID() + type[type.length-1];
+        String random = UUID.randomUUID() + "." + type[type.length-1];
 
         minioClient.putObject(PutObjectArgs
                 .builder()
@@ -48,7 +48,11 @@ public class FileServiceImpl implements FileService {
 
         log.info("Download file {}", fileName);
 
-        return new ByteArrayResource(minioClient.getObject(GetObjectArgs.builder().object(fileName).bucket(bucket).build()).readAllBytes());
+        return new ByteArrayResource(getObjectResponse(fileName, bucket).readAllBytes());
+    }
+
+    public GetObjectResponse getObjectResponse(String fileName, String bucket) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return minioClient.getObject(GetObjectArgs.builder().object(fileName).bucket(bucket).build());
     }
 
     @Override

@@ -177,6 +177,17 @@ public abstract class TaskMapper {
         return null;
     }
 
+    public TaskGroup mapTaskGroup(Long id) {
+        return new TaskGroup(id);
+    }
+
+    public Long taskGroupToLong(TaskGroup courses) {
+        if (courses != null) {
+            return courses.getId();
+        }
+        return null;
+    }
+
     public Task map2(Long id) {
         return new Task(id);
     }

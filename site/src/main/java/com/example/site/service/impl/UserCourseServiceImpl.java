@@ -2,6 +2,7 @@ package com.example.site.service.impl;
 
 import com.example.site.dto.notification.NotificationType;
 import com.example.site.dto.usercourse.UserCourseDto;
+import com.example.site.dto.usercourse.UserCourseWithUserTaskDto;
 import com.example.site.exception.ForbiddenException;
 import com.example.site.exception.NotFoundException;
 import com.example.site.mappers.UserCourseMapper;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -122,6 +124,23 @@ public class UserCourseServiceImpl implements UserCourseService {
                 .getAllByCourseIdAndGroupId(groupId, courseId, userDetail.getId(), userDetail.isAdmin())
                 .stream()
                 .map(userCourseMapper::userCourseToUserCourseDto).toList();
+    }
+
+    @Override
+    public List<UserCourseWithUserTaskDto> getUserByCourseIdAndGroupIdv2(Long courseId, Long groupId) {
+
+        UserDetailImpl userDetail = SecurityUtil.getUserDetail();
+
+        List<UserCourseRepository.UserCourseProjection> list = userCourseRepository.getAllByCourseIdAndGroupIdAndUserTask(groupId ,courseId, userDetail.getId(), userDetail.isAdmin());
+
+        Map<UserCourse, List<UserCourseRepository.UserCourseProjection>> map = list.stream().collect(Collectors.groupingBy(UserCourseRepository.UserCourseProjection::getUserCourse));
+
+        return map.entrySet().stream().map(item -> {
+            UserCourseWithUserTaskDto userCourseDto = new UserCourseWithUserTaskDto();
+            userCourseDto.setUserCourse(userCourseMapper.userCourseToUserCourseDto(item.getKey()));
+            userCourseDto.setUserTasks(item.getValue().stream().map(item2 -> userCourseMapper.userCourseToUserTaskDto(item2.getUserTask())).toList());
+            return userCourseDto;
+        }).toList();
     }
 
     @Override

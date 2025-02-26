@@ -2,6 +2,7 @@ package com.example.site.repository;
 
 import com.example.site.model.UserCourse;
 import com.example.site.model.UserCourseId;
+import com.example.site.model.UserTask;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,10 +29,22 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, UserCour
     @Query(value = "from UserCourse  uc where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.groups.id=:groupId and (uc.userCourseId.courses.userCreated.id = :tId or :admin = true) and uc.deleted=false")
     List<UserCourse> getAllByCourseIdAndGroupId(@Param("groupId")Long groupId, @Param("cId") Long courseId, @Param("tId") Long teacherId, @Param("admin") boolean admin);
 
+    @Query(value = "select uc as userCourse, ut as userTask from UserCourse uc left join UserTask ut on uc.userCourseId.courses.id = ut.userTaskId.task.courses.id and uc.userCourseId.user.id = ut.userTaskId.user.id where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.groups.id=:groupId and (uc.userCourseId.courses.userCreated.id = :tId or :admin = true) and uc.deleted=false")
+    List<UserCourseProjection> getAllByCourseIdAndGroupIdAndUserTask(@Param("groupId")Long groupId, @Param("cId") Long courseId, @Param("tId") Long teacherId, @Param("admin") boolean admin);
+
     @Query(value = "from UserCourse  uc where uc.userCourseId.courses.id = :cId and uc.userCourseId.user.id=:userId")
     Optional<UserCourse> getUserCourseByUserIdAndCourse(@Param("userId")Long userId, @Param("cId") Long courseId);
 
 
     @Query(value = "from UserCourse  uc where uc.userCourseId.user.id=:userId")
     List<UserCourse> getByUserId(@Param("userId")Long userId);
+
+
+    interface UserCourseProjection {
+
+        UserCourse getUserCourse();
+
+        UserTask getUserTask();
+
+    }
 }

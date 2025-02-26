@@ -2,6 +2,7 @@ package com.example.site.dto.task;
 
 import com.example.site.model.util.TaskType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -22,6 +23,12 @@ public class TaskDto {
 
     @Schema(description = "Заголовок")
     private String title;
+
+    @Schema(description = "Вложенный файл")
+    private String file;
+
+    @NotNull
+    private Long taskGroup;
 
     @Schema(description = "Тип")
     private TaskType taskType;
